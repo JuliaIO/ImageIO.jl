@@ -14,7 +14,7 @@ Currently provides:
 Install with Pkg:
 
 ```jl
-pkg> add ImageIO  # Press ']' to enter te Pkg REPL mode.
+pkg> add ImageIO  # Press ']' to enter te Pkg REPL mode
 ```
 
 ## Usage
