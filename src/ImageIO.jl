@@ -1,6 +1,6 @@
 module ImageIO
 
-using FileIO: File, DataFormat, Stream
+using FileIO: File, DataFormat, Stream, stream
 
 ## PNGs
 const PNGFiles_LOADED = Ref(false)
