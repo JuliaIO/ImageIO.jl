@@ -41,10 +41,10 @@ function save(s::Stream{DataFormat{:PNG}}, image::S; permute_horizontal=true, ma
     end
     imgout = copy(image)
     if permute_horizontal
-        imgout = reverse(imgout, dims=1)
+        permutedims!(imgout, (2,1))
     end
     if mapi != identity
-        imgout = map(mapi, imgout)
+        map!(mapi, imgout)
     end
     return Base.invokelatest(PNGFiles.save, stream(s), imgout, kwargs...)
 end
