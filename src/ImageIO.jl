@@ -34,7 +34,7 @@ function save(f::File{DataFormat{:PNG}}, image::S; kwargs...) where {T, S<:Union
     end
     return Base.invokelatest(PNGFiles.save, f.filename, image, kwargs...)
 end
-function save(s::Stream{DataFormat{:PNG}}, image::S; permute_horizontal=true, mapi=identity, kwargs...) where {T, S<:Union{AbstractMatrix, AbstractArray{T,3}}}
+function save(s::Stream{DataFormat{:PNG}}, image::S; permute_horizontal=false, mapi=identity, kwargs...) where {T, S<:Union{AbstractMatrix, AbstractArray{T,3}}}
     if !PNGFiles_LOADED[]
         @eval ImageIO import PNGFiles
         PNGFiles_LOADED[] = isdefined(ImageIO, :PNGFiles)
@@ -44,7 +44,7 @@ function save(s::Stream{DataFormat{:PNG}}, image::S; permute_horizontal=true, ma
         permutedims!(imgout, (2,1))
     end
     if mapi != identity
-        map!(mapi, imgout)
+        map!(mapi, imgout, imgout)
     end
     return Base.invokelatest(PNGFiles.save, stream(s), imgout, kwargs...)
 end
