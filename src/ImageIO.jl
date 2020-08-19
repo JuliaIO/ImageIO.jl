@@ -41,7 +41,7 @@ function save(s::Stream{DataFormat{:PNG}}, image::S; permute_horizontal=false, m
     end
     imgout = copy(image)
     if permute_horizontal
-        permutedims!(imgout, (2,1))
+        permutedims!(imgout, imgout, (2,1))
     end
     if mapi != identity
         map!(mapi, imgout, imgout)
