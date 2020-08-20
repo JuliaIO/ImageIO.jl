@@ -39,14 +39,13 @@ function save(s::Stream{DataFormat{:PNG}}, image::S; permute_horizontal=false, m
         @eval ImageIO import PNGFiles
         PNGFiles_LOADED[] = isdefined(ImageIO, :PNGFiles)
     end
-    imgout = copy(image)
+    imgout = map(mapi, image)
     if permute_horizontal
-        permutedims!(imgout, imgout, (2,1))
+        perm = ndims(imgout) == 2 ? (2, 1) : ndims(imgout) == 3 ? (2, 1, 3) : error("$(ndims(imgout)) dims array is not supported")
+        return Base.invokelatest(PNGFiles.save, stream(s), PermutedDimsArray(imgout, perms), kwargs...) 
+    else
+        return Base.invokelatest(PNGFiles.save, stream(s), imgout, kwargs...)
     end
-    if mapi != identity
-        map!(mapi, imgout, imgout)
-    end
-    return Base.invokelatest(PNGFiles.save, stream(s), imgout, kwargs...)
 end
 
 end # module
