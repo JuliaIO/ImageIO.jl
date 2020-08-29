@@ -1,4 +1,4 @@
-name: Invalidations
+name: Invalidations (julia nightly)
 
 on: [push]
 
