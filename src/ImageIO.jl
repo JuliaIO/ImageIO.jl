@@ -1,6 +1,5 @@
 module ImageIO
 
-using Images
 using FileIO: File, DataFormat, Stream, stream
 
 ## PNGs
