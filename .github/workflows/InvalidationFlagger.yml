@@ -1,10 +1,15 @@
-name: Invalidations (julia nightly)
+name: Invalidations
 
 on: [push]
 
 jobs:
   evaluate:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        julia-version: ['nightly']
+        julia-arch: [x64]
+        os: [ubuntu-latest]
     steps: 
       - name: Get package name
         id: info
@@ -14,7 +19,7 @@ jobs:
             echo "::set-output name=packagename::$PACKAGENAME"
       - uses: julia-actions/setup-julia@v1
         with:
-          version: 'nightly'
+          version: ${{ matrix.julia-version }}
       - uses: actions/checkout@v1.0.0
       - uses: julia-actions/julia-buildpkg@latest
       - name: Install SnoopCompile tools
