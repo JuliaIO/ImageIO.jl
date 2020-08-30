@@ -5,4 +5,4 @@ jobs:
   evaluate:
     runs-on: ubuntu-latest
     steps:
-    - uses: ianshmean/julia-invalidations@v1
+    - uses: ianshmean/julia-invalidations@master
