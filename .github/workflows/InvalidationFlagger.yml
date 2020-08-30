@@ -9,69 +9,34 @@ jobs:
   evaluate:
     runs-on: ubuntu-latest
     steps:
-    # - uses: julia-actions/setup-julia@v1
-    #   with:
-    #     version: 'nightly'
-    # - uses: actions/checkout@v2
-    # - uses: julia-actions/julia-buildpkg@latest
-    # - uses: julia-actions/julia-invalidations@v1
-    #   id: invs_pr
-    # 
-    # - uses: actions/checkout@v2
-    #   with:
-    #     ref: 'master'
-    # - uses: julia-actions/julia-buildpkg@latest
-    # - uses: julia-actions/julia-invalidations@v1
-    #   id: invs_master
-    # 
-    # - name: Print invalidation report
-    #   id: report
-    #   run: |
-    #     echo "Invalidations on master: ${{ steps.invs_master.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps)"
-    #     echo "This branch: ${{ steps.invs_pr.outputs.total }} (${{ steps.invs_pr.outputs.deps }} via deps)"
-    #   shell: bash
-      
-      
-    - uses: octokit/request-action@v2.x
-      id: create_check_run
+    - uses: julia-actions/setup-julia@v1
       with:
-        route: POST /repos/:repository/check-runs
-        repository: ${{ github.repository }}
-        mediaType: | # The | is significant!
-          previews: 
-            - antiope
-        name: "Test check run"
-        head_sha: ${{ github.sha }}
-        output: | # The | is significant!
-          title: Test check run title
-          summary: A summary of the test check run
-          images:
-            - alt: Test image
-              image_url: https://octodex.github.com/images/jetpacktocat.png
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    # Update check run to completed, succesful status
-    - uses: octokit/request-action@v2.x
-      id: update_check_run
-      with:
-        route: PATCH /repos/:repository/check-runs/:check_run_id
-        repository: ${{ github.repository }}
-        mediaType: | # The | is significant!
-          previews: 
-            - antiope
-        check_run_id: ${{ fromJson(steps.create_check_run.outputs.data).id }}
-        conclusion: "success"
-        status: "completed"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        version: 'nightly'
         
+    - uses: actions/checkout@v2
+    - uses: julia-actions/julia-buildpkg@latest
+    - uses: julia-actions/julia-invalidations@v1
+      id: invs_pr
+    
+    - uses: actions/checkout@v2
+      with:
+        ref: 'master'
+    - uses: julia-actions/julia-buildpkg@latest
+    - uses: julia-actions/julia-invalidations@v1
+      id: invs_master
+    
+    - name: Print invalidation report
+      id: report
+      run: |
+        echo "Invalidations on master: ${{ steps.invs_master.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps)"
+        echo "This branch: ${{ steps.invs_pr.outputs.total }} (${{ steps.invs_pr.outputs.deps }} via deps)"
+      shell: bash  
       
-    # - name: Report invalidations to check
-    #   uses: dflydev/check-runs-action@v1
-    #   with:
-    #     token: ${{ secrets.GITHUB_TOKEN }}
-    #     output: '{"summary":"${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master"}'
-    #     id: report
-    #     name: invalidations
-    #     conclusion: ${{steps.invs_pr.outputs.total} > ${{steps.invs_master.outputs.total}} ? "success" : "failure"
+    - name: Report invalidations to check
+      uses: dflydev/check-runs-action@v1
+      with:
+        token: ${{ secrets.IAN_PAT }}
+        output: '{"summary":"${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master"}'
+        id: report
+        name: invalidations
+        conclusion: ${{steps.invs_pr.outputs.total} > ${{steps.invs_master.outputs.total}} ? "success" : "failure"
