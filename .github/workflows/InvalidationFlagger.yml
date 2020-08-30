@@ -22,11 +22,10 @@ jobs:
     
     - name: Report invalidation counts
       run: |
-        echo "Test script: ${{ steps.info.outputs.testscript }}"
         echo "Invalidations on master: ${{ steps.invs_master.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps)"
         echo "This branch: ${{ steps.invs_pr.outputs.total }} (${{ steps.invs_pr.outputs.deps }} via deps)"
       shell: bash
-    - name: PR has the same or fewer invalidations, compared to master
+    - name: PR doesn't increase number of invalidations
       run: |
         if (( ${{ steps.invs_pr.outputs.total }} > ${{ steps.invs_master.outputs.total }} )); then
             exit 1
