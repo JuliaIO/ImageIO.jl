@@ -5,4 +5,30 @@ jobs:
   evaluate:
     runs-on: ubuntu-latest
     steps:
+    - uses: julia-actions/setup-julia@v1
+      with:
+        version: 'nightly'
+    - uses: actions/checkout@v1.0.0
+    - uses: julia-actions/julia-buildpkg@latest
     - uses: ianshmean/julia-invalidations@master
+      id: invs_pr
+    
+    - uses: actions/checkout@v1.0.0
+      with:
+        ref: 'master'
+    - uses: julia-actions/julia-buildpkg@latest
+    - uses: ianshmean/julia-invalidations@master
+      id: invs_master
+    
+    - name: Report invalidation counts
+      run: |
+        echo "Test script: ${{ steps.info.outputs.testscript }}"
+        echo "Invalidations on master: ${{ steps.invs_master.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps)"
+        echo "This branch: ${{ steps.invs_pr.outputs.total }} (${{ steps.invs_pr.outputs.deps }} via deps)"
+      shell: bash
+    - name: PR has the same or fewer invalidations, compared to master
+      run: |
+        if (( ${{ steps.invs_pr.outputs.total }} > ${{ steps.invs_master.outputs.total }} )); then
+            exit 1
+        fi
+      shell: bash
