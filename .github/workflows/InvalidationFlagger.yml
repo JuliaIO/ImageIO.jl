@@ -29,14 +29,17 @@ jobs:
         echo "Invalidations on master: ${{ steps.invs_master.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps)"
         echo "This branch: ${{ steps.invs_pr.outputs.total }} (${{ steps.invs_pr.outputs.deps }} via deps)"
       shell: bash
-    - name: Report invalidations on check conclusion
+    - name: Report invalidations on check conclusion (pass)
       uses: dflydev/check-runs-action@v1
+      if: ${{ steps.invs_pr.outputs.total <= steps.invs_master.outputs.total }}
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         output: '{"title":"${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master"}'
-    - name: PR doesn't increase number of invalidations
-      run: |
-        if (( ${{ steps.invs_pr.outputs.total }} > ${{ steps.invs_master.outputs.total }} )); then
-            exit 1
-        fi
-      shell: bash
+        conclusion: success
+    - name: Report invalidations on check conclusion (fail)
+      uses: dflydev/check-runs-action@v1
+      if: ${{ steps.invs_pr.outputs.total > steps.invs_master.outputs.total }}
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        output: '{"title":"${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master"}'
+        conclusion: failure
