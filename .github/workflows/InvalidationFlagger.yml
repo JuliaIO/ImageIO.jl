@@ -31,32 +31,28 @@ jobs:
         echo "This branch: ${{ steps.invs_pr.outputs.total }} (${{ steps.invs_pr.outputs.deps }} via deps)"
       shell: bash
       
-    - name: Report no change in invalidations (neutral)
-      uses: dflydev/check-runs-action@v1
-      if: ${{ steps.invs_pr.outputs.total == steps.invs_master.outputs.total }}
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        output: '{"summary":"${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master"}'
-        id: report
-        name: invalidations
-        conclusion: neutral
-        
-    - name: Report reduction in invalidations (success)
-      uses: dflydev/check-runs-action@v1
-      if: ${{ steps.invs_pr.outputs.total < steps.invs_master.outputs.total }}
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        output: '{"summary":"${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master"}'
-        id: report
-        name: invalidations
-        conclusion: success
-        
-    - name: Report increase in invalidations (fail)
-      uses: dflydev/check-runs-action@v1
-      if: ${{ steps.invs_pr.outputs.total > steps.invs_master.outputs.total }}
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        output: '{"summary":"${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master"}'
-        id: report
-        name: invalidations
-        conclusion: failure
+      
+    - uses: octokit/request-action@v2.x
+        id: create_check_run
+        with:
+          route: POST /repos/:repository/check-runs
+          repository: ${{ github.repository }}
+          name: "Test check run"
+          head_sha: ${{ github.sha }}
+          output: | # The | is significant!
+            title: Test check run title
+            summary: A summary of the test check run
+            images:
+              - alt: Test image
+                image_url: https://octodex.github.com/images/jetpacktocat.png
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+    # - name: Report invalidations to check
+    #   uses: dflydev/check-runs-action@v1
+    #   with:
+    #     token: ${{ secrets.GITHUB_TOKEN }}
+    #     output: '{"summary":"${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master"}'
+    #     id: report
+    #     name: invalidations
+    #     conclusion: ${{steps.invs_pr.outputs.total} > ${{steps.invs_master.outputs.total}} ? "success" : "failure"
