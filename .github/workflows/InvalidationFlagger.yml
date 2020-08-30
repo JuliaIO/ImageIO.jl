@@ -38,6 +38,7 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         output: '{"summary":"${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master"}'
         id: report
+        name: invalidations
         conclusion: neutral
         
     - name: Report reduction in invalidations (success)
@@ -47,6 +48,7 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         output: '{"summary":"${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master"}'
         id: report
+        name: invalidations
         conclusion: success
         
     - name: Report increase in invalidations (fail)
@@ -56,4 +58,5 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         output: '{"summary":"${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master"}'
         id: report
+        name: invalidations
         conclusion: failure
