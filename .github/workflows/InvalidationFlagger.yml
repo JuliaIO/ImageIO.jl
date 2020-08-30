@@ -24,29 +24,36 @@ jobs:
     - uses: julia-actions/julia-invalidations@v1
       id: invs_master
     
-    - name: Report invalidation counts
+    - name: Print invalidation report
+      id: report
       run: |
         echo "Invalidations on master: ${{ steps.invs_master.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps)"
         echo "This branch: ${{ steps.invs_pr.outputs.total }} (${{ steps.invs_pr.outputs.deps }} via deps)"
       shell: bash
-    - name: Report invalidations on check conclusion (pass)
+      
+    - name: Report no change in invalidations (neutral)
       uses: dflydev/check-runs-action@v1
       if: ${{ steps.invs_pr.outputs.total == steps.invs_master.outputs.total }}
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         output: '{"summary":"${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master"}'
+        id: report
         conclusion: neutral
-    - name: Report invalidations on check conclusion (pass)
+        
+    - name: Report reduction in invalidations (success)
       uses: dflydev/check-runs-action@v1
       if: ${{ steps.invs_pr.outputs.total < steps.invs_master.outputs.total }}
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         output: '{"summary":"${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master"}'
+        id: report
         conclusion: success
-    - name: Report invalidations on check conclusion (fail)
+        
+    - name: Report increase in invalidations (fail)
       uses: dflydev/check-runs-action@v1
       if: ${{ steps.invs_pr.outputs.total > steps.invs_master.outputs.total }}
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         output: '{"summary":"${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master"}'
+        id: report
         conclusion: failure
