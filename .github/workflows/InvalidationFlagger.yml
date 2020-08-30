@@ -39,4 +39,4 @@ jobs:
         output: '{"summary":"${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master"}'
         id: report
         name: invalidations
-        conclusion: ${{steps.invs_pr.outputs.total} > ${{steps.invs_master.outputs.total}} ? "success" : "failure"
+        conclusion: "success"
