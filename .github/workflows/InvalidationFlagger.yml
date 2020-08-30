@@ -1,51 +1,8 @@
 name: Invalidations
-
 on: [push]
 
 jobs:
   evaluate:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        julia-version: ['nightly']
-        julia-arch: [x64]
-        os: [ubuntu-latest]
-    steps: 
-      - name: Get package name
-        id: info
-        run: |
-            REPONAME="${{ github.event.repository.name }}"
-            PACKAGENAME=${REPONAME%.jl}
-            echo "::set-output name=packagename::$PACKAGENAME"
-      - uses: julia-actions/setup-julia@v1
-        with:
-          version: ${{ matrix.julia-version }}
-      - uses: actions/checkout@v1.0.0
-      - uses: julia-actions/julia-buildpkg@latest
-      - name: Install SnoopCompile tools
-        run: julia --project -e 'using Pkg; Pkg.add(["SnoopCompileCore", "SnoopCompile"])'
-      - name: Load package on branch
-        id: invs_pr
-        run: julia --project -e 'using SnoopCompileCore; invalidations = @snoopr begin using ${{ steps.info.outputs.packagename }} end; using SnoopCompile; inv_owned = length(filtermod(${{ steps.info.outputs.packagename }}, invalidation_trees(invalidations))); inv_total = length(uinvalidated(invalidations)); inv_deps = inv_total - inv_owned; @show inv_total, inv_deps; println("::set-output name=total::$(inv_total)");  println("::set-output name=deps::$(inv_deps)")'
-      - uses: actions/checkout@v1.0.0
-        with:
-          ref: 'master'
-      - uses: julia-actions/julia-buildpkg@latest
-      - name: Install SnoopCompile tools
-        run: julia --project -e 'using Pkg; Pkg.add(["SnoopCompileCore", "SnoopCompile"])'
-      - name: Load package on master
-        id: invs_master
-        run: julia --project -e 'using SnoopCompileCore; invalidations = @snoopr begin using ${{ steps.info.outputs.packagename }} end; using SnoopCompile; inv_owned = length(filtermod(${{ steps.info.outputs.packagename }}, invalidation_trees(invalidations))); inv_total = length(uinvalidated(invalidations)); inv_deps = inv_total - inv_owned; @show inv_total, inv_deps; println("::set-output name=total::$(inv_total)");  println("::set-output name=deps::$(inv_deps)")'
-      - name: Report invalidation counts
-        run: |
-          echo "Invalidations on master: ${{ steps.invs_master.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps)"
-          echo "This branch: ${{ steps.invs_pr.outputs.total }} (${{ steps.invs_pr.outputs.deps }} via deps)"
-      - name: PR has the same or fewer invalidations, compared to master
-        run: |
-          if (( ${{ steps.invs_pr.outputs.total }} > ${{ steps.invs_master.outputs.total }} )); then
-              exit 1
-          fi
-          
-
-          
-          
+    runs-on: ubuntu-latest
+    steps:
+    - uses: ianshmean/julia-invalidations@v1
