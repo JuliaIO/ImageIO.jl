@@ -33,7 +33,7 @@ jobs:
       uses: dflydev/check-runs-action@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        output:
+        output: |
           title: invalidation checks
           summary: ${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master
     - name: PR doesn't increase number of invalidations
