@@ -37,6 +37,9 @@ jobs:
       with:
         route: POST /repos/:repository/check-runs
         repository: ${{ github.repository }}
+        mediaType: | # The | is significant!
+            previews: 
+              - antiope
         name: "Test check run"
         head_sha: ${{ github.sha }}
         output: | # The | is significant!
