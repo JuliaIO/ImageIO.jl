@@ -35,4 +35,4 @@ jobs:
         output: '{"summary":Invalidations on master: ${{ steps.invs_master.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps)\nThis branch: ${{ steps.invs_pr.outputs.total }} (${{ steps.invs_pr.outputs.deps }} via deps)"}'
         id: Invalidations
         name: "${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master"
-        conclusion: ${{ steps.invs_pr.outputs.total > steps.invs_master.outputs.total }} ? "failure" : "success"
+        conclusion: ${{ steps.invs_pr.outputs.total > steps.invs_master.outputs.total ? "failure" : "success" }}
