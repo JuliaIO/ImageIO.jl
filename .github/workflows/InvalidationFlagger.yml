@@ -33,7 +33,7 @@ jobs:
       uses: dflydev/check-runs-action@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        output: '{"title":"${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master"}'
+        output: '{"title":"${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master","summary":""}'
         id: report
         name: report
         conclusion: "failure"
@@ -43,7 +43,7 @@ jobs:
       uses: dflydev/check-runs-action@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        output: '{"title":"${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master"}'
+        output: '{"title":"${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master","summary":""}'
         id: report
         name: report
         conclusion: "success"
