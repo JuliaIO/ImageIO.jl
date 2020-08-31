@@ -28,11 +28,20 @@ jobs:
         echo "This branch: ${{ steps.invs_pr.outputs.total }} (${{ steps.invs_pr.outputs.deps }} via deps)"
       shell: bash  
       
-    - name: Report invalidations to check
+    - name: Report increased invalidations (fail)
+      if: ${{ steps.invs_pr.outputs.total > steps.invs_master.outputs.total }}
       uses: dflydev/check-runs-action@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        output: '{"summary":"${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master"}'
         id: report
-        name: invalidations
+        name: "${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master"
+        conclusion: "failure"
+  
+    - name: Report no change or reduction in invalidations (success)
+      if: ${{ steps.invs_pr.outputs.total <= steps.invs_master.outputs.total }}
+      uses: dflydev/check-runs-action@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        id: report
+        name: "${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master"
         conclusion: "success"
