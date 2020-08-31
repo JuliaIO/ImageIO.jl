@@ -22,7 +22,6 @@ jobs:
       id: invs_master
     
     - name: Print invalidation report
-      id: report
       run: |
         echo "Invalidations on master: ${{ steps.invs_master.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps)"
         echo "This branch: ${{ steps.invs_pr.outputs.total }} (${{ steps.invs_pr.outputs.deps }} via deps)"
@@ -33,8 +32,8 @@ jobs:
       uses: dflydev/check-runs-action@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        id: report
-        name: "${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master"
+        output: '{"title":"${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master"}'
+        name: Report
         conclusion: "failure"
   
     - name: Report no change or reduction in invalidations (success)
@@ -42,6 +41,6 @@ jobs:
       uses: dflydev/check-runs-action@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        id: report
-        name: "${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master"
+        output: '{"title":"${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master"}'
+        name: Report
         conclusion: "success"
