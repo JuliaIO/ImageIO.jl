@@ -46,7 +46,8 @@ jobs:
       
     # Update check run to completed, succesful status
     - uses: octokit/request-action@v2.x
-      id: update_check_run
+      if: ${{ steps.invs_pr.outputs.total }} > ${{ steps.invs_master.outputs.total }}
+      id: update_check_run_failure
       with:
         route: PATCH /repos/:repository/check-runs/:check_run_id
         repository: ${{ github.repository }}
@@ -55,11 +56,31 @@ jobs:
             - antiope
         check_run_id: ${{ fromJson(steps.create_check_run.outputs.data).id }}
         name: "report"
-        conclusion: ${{ steps.invs_pr.outputs.total }} > ${{ steps.invs_master.outputs.total }} ? "failure" : "success"
+        conclusion: "failure"
         status: "completed"
         output: |
           title: "${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master"
-          summary: "invalidation check succeed"
+          summary: "PR increases number of invalidations"
           text: "Invalidations on master: ${{ steps.invs_master.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps)\nThis branch: ${{ steps.invs_pr.outputs.total }} (${{ steps.invs_pr.outputs.deps }} via deps)"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: octokit/request-action@v2.x
+        if: ${{ steps.invs_pr.outputs.total }} <= ${{ steps.invs_master.outputs.total }}
+        id: update_check_run_failure
+        with:
+          route: PATCH /repos/:repository/check-runs/:check_run_id
+          repository: ${{ github.repository }}
+          mediaType: | # The | is significant!
+            previews: 
+              - antiope
+          check_run_id: ${{ fromJson(steps.create_check_run.outputs.data).id }}
+          name: "report"
+          conclusion: "success"
+          status: "completed"
+          output: |
+            title: "${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master"
+            summary: "PR is unchanged or reduces number of invalidations"
+            text: "Invalidations on master: ${{ steps.invs_master.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps)\nThis branch: ${{ steps.invs_pr.outputs.total }} (${{ steps.invs_pr.outputs.deps }} via deps)"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
