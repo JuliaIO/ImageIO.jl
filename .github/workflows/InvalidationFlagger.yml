@@ -67,7 +67,7 @@ jobs:
         
     - uses: octokit/request-action@v2.x
       if: ${{ steps.invs_pr.outputs.total }} <= ${{ steps.invs_master.outputs.total }}
-      id: update_check_run_failure
+      id: update_check_run_success
       with:
         route: PATCH /repos/:repository/check-runs/:check_run_id
         repository: ${{ github.repository }}
