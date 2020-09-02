@@ -25,6 +25,8 @@ jobs:
       with:
         version: 'nightly'
         
+    - run: julia -e 'error()'
+        
     - uses: actions/checkout@v2
     - uses: julia-actions/julia-buildpkg@latest
     - uses: julia-actions/julia-invalidations@v1
@@ -82,5 +84,24 @@ jobs:
           title: "${{ steps.invs_pr.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps) vs. ${{ steps.invs_master.outputs.total }} on master"
           summary: "PR is unchanged or reduces number of invalidations"
           text: "Invalidations on master: ${{ steps.invs_master.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps)\nThis branch: ${{ steps.invs_pr.outputs.total }} (${{ steps.invs_pr.outputs.deps }} via deps)"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    - uses: octokit/request-action@v2.x
+      if: ${{ failure() }}
+      id: update_check_run_error
+      with:
+        route: PATCH /repos/:repository/check-runs/:check_run_id
+        repository: ${{ github.repository }}
+        mediaType: | # The | is significant!
+          previews: 
+            - antiope
+        check_run_id: ${{ fromJson(steps.create_check_run.outputs.data).id }}
+        name: "report"
+        conclusion: "neutral"
+        status: "completed"
+        output: |
+          title: "Evaluating invalidations failed"
+          summary: "Evaluating invalidations failed"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
