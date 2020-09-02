@@ -64,7 +64,7 @@ jobs:
           text: "Invalidations on master: ${{ steps.invs_master.outputs.total }} (${{ steps.invs_master.outputs.deps }} via deps)\nThis branch: ${{ steps.invs_pr.outputs.total }} (${{ steps.invs_pr.outputs.deps }} via deps)"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+        
       - uses: octokit/request-action@v2.x
         if: ${{ steps.invs_pr.outputs.total }} <= ${{ steps.invs_master.outputs.total }}
         id: update_check_run_failure
