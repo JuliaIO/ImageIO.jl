@@ -1,45 +1,43 @@
 module ImageIO
 
-using FileIO: File, DataFormat, Stream, stream
+using FileIO: File, DataFormat, Stream, stream, _findmod, topimport
+
+const load_locker = Base.ReentrantLock()
+
+function checked_import(pkg::Symbol)
+    lock(load_locker) do
+        if isdefined(Main, pkg)
+            m1 = getfield(Main, pkg)
+            isa(m1, Module) && return m1
+        end
+        if isdefined(ImageIO, pkg)
+            m1 = getfield(ImageIO, pkg)
+            isa(m1, Module) && return m1
+        end
+        m = _findmod(pkg)
+        m == nothing || return Base.loaded_modules[m]
+        topimport(pkg)
+        return Base.loaded_modules[_findmod(pkg)]
+    end
+end
 
 ## PNGs
-const PNGFiles_LOADED = Ref(false)
 
 function load(f::File{DataFormat{:PNG}}; kwargs...)
-    if !PNGFiles_LOADED[]
-        @eval ImageIO import PNGFiles
-        PNGFiles_LOADED[] = isdefined(ImageIO, :PNGFiles)
-    end
-    return Base.invokelatest(PNGFiles.load, f.filename, kwargs...)
+    return Base.invokelatest(checked_import(:PNGFiles).load, f.filename, kwargs...)
 end
 function load(s::Stream{DataFormat{:PNG}}; kwargs...)
-    if !PNGFiles_LOADED[]
-        @eval ImageIO import PNGFiles
-        PNGFiles_LOADED[] = isdefined(ImageIO, :PNGFiles)
-    end
-    return Base.invokelatest(PNGFiles.load, stream(s), kwargs...)
+    return Base.invokelatest(checked_import(:PNGFiles).load, stream(s), kwargs...)
 end
 function load(s::IO; kwargs...)
-    if !PNGFiles_LOADED[]
-        @eval ImageIO import PNGFiles
-        PNGFiles_LOADED[] = isdefined(ImageIO, :PNGFiles)
-    end
-    return Base.invokelatest(PNGFiles.load, s, kwargs...)
+    return Base.invokelatest(checked_import(:PNGFiles).load, s, kwargs...)
 end
 
 function save(f::File{DataFormat{:PNG}}, image::S; kwargs...) where {T, S<:Union{AbstractMatrix, AbstractArray{T,3}}}
-    if !PNGFiles_LOADED[]
-        @eval ImageIO import PNGFiles
-        PNGFiles_LOADED[] = isdefined(ImageIO, :PNGFiles)
-    end
-    return Base.invokelatest(PNGFiles.save, f.filename, image, kwargs...)
+    return Base.invokelatest(checked_import(:PNGFiles).save, f.filename, image, kwargs...)
 end
 function save(s::Stream{DataFormat{:PNG}}, image::S; kwargs...) where {T, S<:Union{AbstractMatrix, AbstractArray{T,3}}}
-    if !PNGFiles_LOADED[]
-        @eval ImageIO import PNGFiles
-        PNGFiles_LOADED[] = isdefined(ImageIO, :PNGFiles)
-    end
-    return Base.invokelatest(PNGFiles.save, stream(s), image, kwargs...)
+    return Base.invokelatest(checked_import(:PNGFiles).save, stream(s), image, kwargs...)
 end
 
 end # module

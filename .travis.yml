@@ -10,6 +10,8 @@ arch:
 julia:
   - 1
   - nightly
+env:
+  - JULIA_NUM_THREADS=2
 jobs:
   allow_failures:
     - julia: nightly
