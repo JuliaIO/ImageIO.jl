@@ -6,18 +6,18 @@ const load_locker = Base.ReentrantLock()
 
 function checked_import(pkg::Symbol)
     lock(load_locker) do
-        if isdefined(Main, pkg)
-            m1 = getfield(Main, pkg)
-            isa(m1, Module) && return m1
-        end
         if isdefined(ImageIO, pkg)
             m1 = getfield(ImageIO, pkg)
             isa(m1, Module) && return m1
         end
+        if isdefined(Main, pkg)
+            m1 = getfield(Main, pkg)
+            isa(m1, Module) && return m1
+        end
         m = _findmod(pkg)
         m == nothing || return Base.loaded_modules[m]
-        topimport(pkg)
-        return Base.loaded_modules[_findmod(pkg)]
+        @eval ImageIO import $pkg
+        return Base.getfield(ImageIO, pkg)
     end
 end
 
