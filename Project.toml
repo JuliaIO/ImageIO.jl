@@ -5,10 +5,12 @@ version = "0.3.1"
 
 [deps]
 FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
+Netpbm = "f09324ee-3d7c-5217-9330-fc30815ba969"
 PNGFiles = "f57f5aa1-a3ce-4bc8-8ab9-96f992907883"
 
 [compat]
 FileIO = "1.2"
+Netpbm = "1.0"
 PNGFiles = "0.3"
 julia = "1.3"
 
