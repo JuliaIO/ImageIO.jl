@@ -7,6 +7,7 @@ FileIO.jl integration for image files
 
 Currently provides:
 - PNGFiles.jl for Portable Network Graphics via libpng - ([Benchmark vs. ImageMagick & QuartzImageIO](https://github.com/JuliaIO/PNGFiles.jl/issues/1#issuecomment-586749654))
+- Netpbm.jl for Portable Bitmap formats (in pure Julia)
 
 
 ## Installation
@@ -23,4 +24,6 @@ pkg> add ImageIO  # Press ']' to enter te Pkg REPL mode
 using FileIO
 save("test.png", rand(Gray, 100, 100))
 load("test.png")
+save("test.ppm", rand(RGB, 100, 100))
+load("test.ppm")
 ```

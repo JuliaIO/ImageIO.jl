@@ -40,4 +40,26 @@ function save(s::Stream{DataFormat{:PNG}}, image::S; kwargs...) where {T, S<:Uni
     return Base.invokelatest(checked_import(:PNGFiles).save, stream(s), image, kwargs...)
 end
 
+# Netpbm types
+
+for NETPBMFORMAT in (:PBMBinary, :PGMBinary, :PPMBinary, :PBMText, :PGMText, :PPMText)
+    @eval begin
+        function load(f::File{DataFormat{$(Expr(:quote,NETPBMFORMAT))}})
+            return Base.invokelatest(checked_import(:Netpbm).load, f)
+        end
+
+        function load(s::Stream{DataFormat{$(Expr(:quote,NETPBMFORMAT))}})
+            return Base.invokelatest(checked_import(:Netpbm).load, s)
+        end
+
+        function save(f::File{DataFormat{$(Expr(:quote,NETPBMFORMAT))}}, image::S; kwargs...) where {S<:AbstractMatrix}
+            return Base.invokelatest(checked_import(:Netpbm).save, f, image; kwargs...)
+        end
+
+        function save(s::Stream{DataFormat{$(Expr(:quote,NETPBMFORMAT))}}, image::S; kwargs...) where {S<:AbstractMatrix}
+            return Base.invokelatest(checked_import(:Netpbm).save, s, image; kwargs...)
+        end
+    end
+end
+
 end # module
