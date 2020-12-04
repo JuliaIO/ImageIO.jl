@@ -25,7 +25,7 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
         img_saveload = ImageIO.load(f)
         @test all(img .== reinterpret(UInt8, img_saveload))
 
-        open(io->ImageIO.save(Stream(format"PNG", io), img), joinpath(tmpdir, "test_io.png"), "w")
+        open(io->ImageIO.save(Stream(format"PNG", io), img, permute_horizontal=false), joinpath(tmpdir, "test_io.png"), "w")
         img_saveload = open(io->ImageIO.load(Stream(format"PNG", io)), joinpath(tmpdir, "test_io.png"))
         @test all(img .== reinterpret(UInt8, img_saveload))
     end
