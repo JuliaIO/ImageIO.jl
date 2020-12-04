@@ -36,8 +36,15 @@ end
 function save(f::File{DataFormat{:PNG}}, image::S; kwargs...) where {T, S<:Union{AbstractMatrix, AbstractArray{T,3}}}
     return Base.invokelatest(checked_import(:PNGFiles).save, f.filename, image, kwargs...)
 end
-function save(s::Stream{DataFormat{:PNG}}, image::S; kwargs...) where {T, S<:Union{AbstractMatrix, AbstractArray{T,3}}}
-    return Base.invokelatest(checked_import(:PNGFiles).save, stream(s), image, kwargs...)
+
+function save(s::Stream{DataFormat{:PNG}}, image::S; permute_horizontal=false, mapi=identity, kwargs...) where {T, S<:Union{AbstractMatrix, AbstractArray{T,3}}}
+    imgout = map(mapi, image)
+    if permute_horizontal
+        perm = ndims(imgout) == 2 ? (2, 1) : ndims(imgout) == 3 ? (2, 1, 3) : error("$(ndims(imgout)) dims array is not supported")
+        return Base.invokelatest(checked_import(:PNGFiles).save, stream(s), PermutedDimsArray(imgout, perms), kwargs...) 
+    else
+        return Base.invokelatest(checked_import(:PNGFiles).save, stream(s), imgout, kwargs...)
+    end
 end
 
 # Netpbm types
