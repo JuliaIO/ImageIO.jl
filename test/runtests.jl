@@ -79,7 +79,7 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
 
         @testset "Gray TIFF" begin
             img = rand(N0f8, 10, 10)
-            for fmt in (format"TIFF")
+            for fmt in (format"TIFF",)
                 f = File{fmt}(joinpath(tmpdir, "test_fpath.tiff"))
                 ImageIO.save(f, img)
                 img_saveload = ImageIO.load(f)
@@ -93,7 +93,7 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
 
         @testset "Color TIFF" begin
             img = rand(RGB{N0f8}, 10, 10)
-            for fmt in (format"TIFF")
+            for fmt in (format"TIFF",)
                 f = File{fmt}(joinpath(tmpdir, "test_fpath.tiff"))
                 ImageIO.save(f, img)
                 img_saveload = ImageIO.load(f)
