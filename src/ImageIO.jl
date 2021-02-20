@@ -41,7 +41,7 @@ function save(s::Stream{DataFormat{:PNG}}, image::S; permute_horizontal=false, m
     imgout = map(mapi, image)
     if permute_horizontal
         perm = ndims(imgout) == 2 ? (2, 1) : ndims(imgout) == 3 ? (2, 1, 3) : error("$(ndims(imgout)) dims array is not supported")
-        return Base.invokelatest(checked_import(:PNGFiles).save, stream(s), PermutedDimsArray(imgout, perms), kwargs...) 
+        return Base.invokelatest(checked_import(:PNGFiles).save, stream(s), PermutedDimsArray(imgout, perm), kwargs...)
     else
         return Base.invokelatest(checked_import(:PNGFiles).save, stream(s), imgout, kwargs...)
     end
@@ -65,6 +65,40 @@ for NETPBMFORMAT in (:PBMBinary, :PGMBinary, :PPMBinary, :PBMText, :PGMText, :PP
 
         function save(s::Stream{DataFormat{$(Expr(:quote,NETPBMFORMAT))}}, image::S; kwargs...) where {S<:AbstractMatrix}
             return Base.invokelatest(checked_import(:Netpbm).save, s, image; kwargs...)
+        end
+    end
+end
+
+## TIFFs
+
+function load(f::File{DataFormat{:TIFF}}; kwargs...)
+    return Base.invokelatest(checked_import(:TiffImages).load, f.filename, kwargs...)
+end
+function load(s::Stream{DataFormat{:TIFF}}; kwargs...)
+    return Base.invokelatest(checked_import(:TiffImages).load, stream(s), kwargs...)
+end
+function load(s::IO; kwargs...)
+    return Base.invokelatest(checked_import(:TiffImages).load, s, kwargs...)
+end
+
+function save(f::File{DataFormat{:TIFF}}, image::S) where {T, S<:Union{AbstractMatrix, AbstractArray{T,3}}}
+    tiff_image = Base.invokelatest(checked_import(:TiffImages).DenseTaggedImage, image)
+    open(f.filename, "w") do io
+        Base.invokelatest(checked_import(:TiffImages).write, io, tiff_image)
+    end
+end
+
+function save(s::Stream{DataFormat{:TIFF}}, image::S; permute_horizontal=false, mapi=identity) where {T, S<:Union{AbstractMatrix, AbstractArray{T,3}}}
+    imgout = map(mapi, image)
+    tiff_imgout = Base.invokelatest(checked_import(:TiffImages).DenseTaggedImage, imgout)
+    if permute_horizontal
+        perm = ndims(tiff_imgout) == 2 ? (2, 1) : ndims(tiff_imgout) == 3 ? (2, 1, 3) : error("$(ndims(tiff_imgout)) dims array is not supported")
+        open(stream(s), "w") do io ## ???????
+            Base.invokelatest(checked_import(:TiffImages).write, io, PermutedDimsArray(tiff_imgout, perm))
+        end
+    else
+        open(stream(s), "w") do io ## ???????
+            Base.invokelatest(checked_import(:TiffImages).write, io, tiff_imgout)
         end
     end
 end

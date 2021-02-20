@@ -74,4 +74,35 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
             end
         end
     end
+
+    @testset "TIFF" begin
+
+        @testset "Gray TIFF" begin
+            img = rand(N0f8, 10, 10)
+            for fmt in (format"TIFF")
+                f = File{fmt}(joinpath(tmpdir, "test_fpath.tiff"))
+                ImageIO.save(f, img)
+                img_saveload = ImageIO.load(f)
+                @test img == img_saveload
+
+                open(io->ImageIO.save(Stream(fmt, io), img), joinpath(tmpdir, "test_io.tiff"), "w")
+                img_saveload = open(io->ImageIO.load(Stream(fmt, io)), joinpath(tmpdir, "test_io.tiff"))
+                @test img == img_saveload
+            end
+        end
+
+        @testset "Color TIFF" begin
+            img = rand(RGB{N0f8}, 10, 10)
+            for fmt in (format"TIFF")
+                f = File{fmt}(joinpath(tmpdir, "test_fpath.tiff"))
+                ImageIO.save(f, img)
+                img_saveload = ImageIO.load(f)
+                @test img == img_saveload
+
+                open(io->ImageIO.save(Stream(fmt, io), img), joinpath(tmpdir, "test_io.tiff"), "w")
+                img_saveload = open(io->ImageIO.load(Stream(fmt, io)), joinpath(tmpdir, "test_io.tiff"))
+                @test img == img_saveload
+            end
+        end
+    end
 end
