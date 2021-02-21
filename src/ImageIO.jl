@@ -29,9 +29,6 @@ end
 function load(s::Stream{DataFormat{:PNG}}; kwargs...)
     return Base.invokelatest(checked_import(:PNGFiles).load, stream(s), kwargs...)
 end
-function load(s::IO; kwargs...)
-    return Base.invokelatest(checked_import(:PNGFiles).load, s, kwargs...)
-end
 
 function save(f::File{DataFormat{:PNG}}, image::S; kwargs...) where {T, S<:Union{AbstractMatrix, AbstractArray{T,3}}}
     return Base.invokelatest(checked_import(:PNGFiles).save, f.filename, image, kwargs...)
@@ -76,9 +73,6 @@ function load(f::File{DataFormat{:TIFF}}; kwargs...)
 end
 function load(s::Stream{DataFormat{:TIFF}}; kwargs...)
     return Base.invokelatest(checked_import(:TiffImages).load, stream(s), kwargs...)
-end
-function load(s::IO; kwargs...)
-    return Base.invokelatest(checked_import(:TiffImages).load, s, kwargs...)
 end
 
 function save(f::File{DataFormat{:TIFF}}, image::S) where {T, S<:Union{AbstractMatrix, AbstractArray{T,3}}}
