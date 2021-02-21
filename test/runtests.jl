@@ -76,31 +76,16 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
     end
 
     @testset "TIFF" begin
-
-        @testset "Gray TIFF" begin
-            img = rand(N0f8, 10, 10)
-            for fmt in (format"TIFF",)
-                f = File{fmt}(joinpath(tmpdir, "test_fpath.tiff"))
+        for typ in [UInt8, N0f8, Gray{N0f8}, RGB{N0f8}]
+            @testset "$typ TIFF" begin
+                img = rand(typ, 10, 10)
+                f = File{format"TIFF"}(joinpath(tmpdir, "test_fpath.tiff"))
                 ImageIO.save(f, img)
                 img_saveload = ImageIO.load(f)
                 @test img == img_saveload
 
-                open(io->ImageIO.save(Stream(fmt, io), img), joinpath(tmpdir, "test_io.tiff"), "w")
-                img_saveload = open(io->ImageIO.load(Stream(fmt, io)), joinpath(tmpdir, "test_io.tiff"))
-                @test img == img_saveload
-            end
-        end
-
-        @testset "Color TIFF" begin
-            img = rand(RGB{N0f8}, 10, 10)
-            for fmt in (format"TIFF",)
-                f = File{fmt}(joinpath(tmpdir, "test_fpath.tiff"))
-                ImageIO.save(f, img)
-                img_saveload = ImageIO.load(f)
-                @test img == img_saveload
-
-                open(io->ImageIO.save(Stream(fmt, io), img), joinpath(tmpdir, "test_io.tiff"), "w")
-                img_saveload = open(io->ImageIO.load(Stream(fmt, io)), joinpath(tmpdir, "test_io.tiff"))
+                open(io->ImageIO.save(Stream(format"TIFF", io), img), joinpath(tmpdir, "test_io.tiff"), "w")
+                img_saveload = open(io->ImageIO.load(Stream(format"TIFF", io)), joinpath(tmpdir, "test_io.tiff"))
                 @test img == img_saveload
             end
         end
