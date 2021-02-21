@@ -1,7 +1,7 @@
 using Test
 using ImageIO
 using FileIO: File, DataFormat, Stream, @format_str
-using ImageCore: N0f8, RGB
+using ImageCore: N0f8, RGB, Gray
 
 tmpdir = mktempdir()
 Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), multithread tests will be disabled"
@@ -76,7 +76,7 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
     end
 
     @testset "TIFF" begin
-        for typ in [UInt8, N0f8, Gray{N0f8}, RGB{N0f8}]
+        for typ in [UInt8, N0f8, Gray{N0f8}, Gray{Float64}, RGB{N0f8}, RGB{Float64}]
             @testset "$typ TIFF" begin
                 img = rand(typ, 10, 10)
                 f = File{format"TIFF"}(joinpath(tmpdir, "test_fpath.tiff"))
