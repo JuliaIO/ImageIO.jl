@@ -89,4 +89,10 @@ function save(s::Stream{DataFormat{:TIFF}}, image::S; permute_horizontal=false, 
     end
 end
 
+## Precompiles
+
+if Base.VERSION >= v"1.5"
+    @assert Base.precompile(Tuple{typeof(checked_import),Symbol})
+end
+
 end # module
