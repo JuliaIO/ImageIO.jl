@@ -91,8 +91,13 @@ end
 
 ## Precompiles
 
-if Base.VERSION >= v"1.5"
+function _precompile_()
+    ccall(:jl_generating_output, Cint, ()) == 1 || return nothing
     @assert Base.precompile(Tuple{typeof(checked_import),Symbol})
+end
+
+if Base.VERSION >= v"1.5"
+    _precompile_()
 end
 
 end # module
