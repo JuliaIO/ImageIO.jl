@@ -89,8 +89,11 @@ function save(s::Stream{DataFormat{:TIFF}}, image::S; permute_horizontal=false, 
     end
 end
 
-## Precompiles
+## Function names labelled for FileIO. Makes FileIO lookup quicker
+const fileio_save = save
+const fileio_load = load
 
+## Precompiles
 function _precompile_()
     ccall(:jl_generating_output, Cint, ()) == 1 || return nothing
     @assert Base.precompile(Tuple{typeof(checked_import),Symbol})
