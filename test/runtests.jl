@@ -8,6 +8,16 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
 @testset "ImageIO" begin
 
     @testset "PNGs" begin
+        if Threads.nthreads() > 1 ## NOTE: This test must go first, to test that PNGFiles loading behaves correctly
+            @testset "Threaded save" begin
+                # test that loading of PNGFiles happens sequentially and doesn't segfault
+                img = rand(UInt8, 10, 10)
+                Threads.@threads for i in 1:Threads.nthreads()
+                    f = File{DataFormat{:PNG}}(joinpath(tmpdir, "test_fpath_$i.png"))
+                    ImageIO.save(f, img)
+                end
+            end
+        end
         for typ in [UInt8, N0f8, Gray{N0f8}, RGB{N0f8}] # TODO: Fix 0:1, Gray{Float64}, RGB{Float64} in PNGFiles
             @testset "$typ PNG" begin
                 img = rand(typ, 10, 10)
@@ -26,16 +36,6 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
                     @test all(img .== reinterpret(UInt8, img_saveload))
                 else
                     @test img == img_saveload
-                end
-            end
-        end
-        if Threads.nthreads() > 1
-            @testset "Threaded save" begin
-                # test that loading of PNGFiles happens sequentially and doesn't segfault
-                img = rand(UInt8, 10, 10)
-                Threads.@threads for i in 1:Threads.nthreads()
-                    f = File{DataFormat{:PNG}}(joinpath(tmpdir, "test_fpath_$i.png"))
-                    ImageIO.save(f, img)
                 end
             end
         end
