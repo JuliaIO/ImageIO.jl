@@ -9,33 +9,33 @@ const idTiffImages = Base.PkgId(UUID("731e570b-9d59-4bfa-96dc-6df516fadf69"), "T
 
 ## PNGs
 
-const libload_lock = [Threads.SpinLock()]
-function lazy_load(pkgid)
+const load_locker = Threads.ReentrantLock()
+function checked_import(pkgid)
     Base.root_module_exists(pkgid) && return Base.root_module(pkgid)
     # If not available, lock and load the library in a sequential order
-    lock(libload_lock[1]) do
+    lock(load_locker) do
         Base.require(pkgid)
     end
 end
 
 function load(f::File{DataFormat{:PNG}}; kwargs...)
-    return Base.invokelatest(lazy_load(idPNGFiles).load, f.filename, kwargs...)
+    return Base.invokelatest(checked_import(idPNGFiles).load, f.filename, kwargs...)
 end
 function load(s::Stream{DataFormat{:PNG}}; kwargs...)
-    return Base.invokelatest(lazy_load(idPNGFiles).load, stream(s), kwargs...)
+    return Base.invokelatest(checked_import(idPNGFiles).load, stream(s), kwargs...)
 end
 
 function save(f::File{DataFormat{:PNG}}, image::S; kwargs...) where {T, S<:Union{AbstractMatrix, AbstractArray{T,3}}}
-    return Base.invokelatest(lazy_load(idPNGFiles).save, f.filename, image, kwargs...)
+    return Base.invokelatest(checked_import(idPNGFiles).save, f.filename, image, kwargs...)
 end
 
 function save(s::Stream{DataFormat{:PNG}}, image::S; permute_horizontal=false, mapi=identity, kwargs...) where {T, S<:Union{AbstractMatrix, AbstractArray{T,3}}}
     imgout = map(mapi, image)
     if permute_horizontal
         perm = ndims(imgout) == 2 ? (2, 1) : ndims(imgout) == 3 ? (2, 1, 3) : error("$(ndims(imgout)) dims array is not supported")
-        return Base.invokelatest(lazy_load(idPNGFiles).save, stream(s), PermutedDimsArray(imgout, perm), kwargs...)
+        return Base.invokelatest(checked_import(idPNGFiles).save, stream(s), PermutedDimsArray(imgout, perm), kwargs...)
     else
-        return Base.invokelatest(lazy_load(idPNGFiles).save, stream(s), imgout, kwargs...)
+        return Base.invokelatest(checked_import(idPNGFiles).save, stream(s), imgout, kwargs...)
     end
 end
 
@@ -44,19 +44,19 @@ end
 for NETPBMFORMAT in (:PBMBinary, :PGMBinary, :PPMBinary, :PBMText, :PGMText, :PPMText)
     @eval begin
         function load(f::File{DataFormat{$(Expr(:quote,NETPBMFORMAT))}})
-            return Base.invokelatest(lazy_load(idNetpbm).load, f)
+            return Base.invokelatest(checked_import(idNetpbm).load, f)
         end
 
         function load(s::Stream{DataFormat{$(Expr(:quote,NETPBMFORMAT))}})
-            return Base.invokelatest(lazy_load(idNetpbm).load, s)
+            return Base.invokelatest(checked_import(idNetpbm).load, s)
         end
 
         function save(f::File{DataFormat{$(Expr(:quote,NETPBMFORMAT))}}, image::S; kwargs...) where {S<:AbstractMatrix}
-            return Base.invokelatest(lazy_load(idNetpbm).save, f, image; kwargs...)
+            return Base.invokelatest(checked_import(idNetpbm).save, f, image; kwargs...)
         end
 
         function save(s::Stream{DataFormat{$(Expr(:quote,NETPBMFORMAT))}}, image::S; kwargs...) where {S<:AbstractMatrix}
-            return Base.invokelatest(lazy_load(idNetpbm).save, s, image; kwargs...)
+            return Base.invokelatest(checked_import(idNetpbm).save, s, image; kwargs...)
         end
     end
 end
@@ -64,23 +64,23 @@ end
 ## TIFFs
 
 function load(f::File{DataFormat{:TIFF}}; kwargs...)
-    return Base.invokelatest(lazy_load(idTiffImages).load, f.filename, kwargs...)
+    return Base.invokelatest(checked_import(idTiffImages).load, f.filename, kwargs...)
 end
 function load(s::Stream{DataFormat{:TIFF}}; kwargs...)
-    return Base.invokelatest(lazy_load(idTiffImages).load, stream(s), kwargs...)
+    return Base.invokelatest(checked_import(idTiffImages).load, stream(s), kwargs...)
 end
 
 function save(f::File{DataFormat{:TIFF}}, image::S) where {T, S<:Union{AbstractMatrix, AbstractArray{T,3}}}
-    Base.invokelatest(lazy_load(idTiffImages).save, f.filename, image)
+    Base.invokelatest(checked_import(idTiffImages).save, f.filename, image)
 end
 
 function save(s::Stream{DataFormat{:TIFF}}, image::S; permute_horizontal=false, mapi=identity) where {T, S<:Union{AbstractMatrix, AbstractArray{T,3}}}
     imgout = map(mapi, image)
     if permute_horizontal
         perm = ndims(imgout) == 2 ? (2, 1) : ndims(imgout) == 3 ? (2, 1, 3) : error("$(ndims(imgout)) dims array is not supported")
-        Base.invokelatest(lazy_load(idTiffImages).save, stream(s), PermutedDimsArray(imgout, perm))
+        Base.invokelatest(checked_import(idTiffImages).save, stream(s), PermutedDimsArray(imgout, perm))
     else
-        Base.invokelatest(lazy_load(idTiffImages).save, stream(s), imgout)
+        Base.invokelatest(checked_import(idTiffImages).save, stream(s), imgout)
     end
 end
 
