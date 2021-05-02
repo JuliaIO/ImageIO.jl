@@ -29,14 +29,16 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
                 else
                     @test img == img_saveload
                 end
+                @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
 
-                open(io->ImageIO.save(Stream(format"PNG", io), img, permute_horizontal=false), joinpath(tmpdir, "test_io.png"), "w")
-                img_saveload = open(io->ImageIO.load(Stream(format"PNG", io)), joinpath(tmpdir, "test_io.png"))
+                open(io->ImageIO.save(Stream{format"PNG"}(io), img, permute_horizontal=false), joinpath(tmpdir, "test_io.png"), "w")
+                img_saveload = open(io->ImageIO.load(Stream{format"PNG"}(io)), joinpath(tmpdir, "test_io.png"))
                 if typ == UInt8
                     @test all(img .== reinterpret(UInt8, img_saveload))
                 else
                     @test img == img_saveload
                 end
+                @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
             end
         end
     end
@@ -49,10 +51,12 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
                 ImageIO.save(f, img)
                 img_saveload = ImageIO.load(f)
                 @test img == img_saveload
+                @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
 
-                open(io->ImageIO.save(Stream(fmt, io), img), joinpath(tmpdir, "test_io.pbm"), "w")
-                img_saveload = open(io->ImageIO.load(Stream(fmt, io)), joinpath(tmpdir, "test_io.pbm"))
+                open(io->ImageIO.save(Stream{fmt}(io), img), joinpath(tmpdir, "test_io.pbm"), "w")
+                img_saveload = open(io->ImageIO.load(Stream{fmt}(io)), joinpath(tmpdir, "test_io.pbm"))
                 @test img == img_saveload
+                @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
             end
         end
 
@@ -63,10 +67,12 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
                 ImageIO.save(f, img)
                 img_saveload = ImageIO.load(f)
                 @test img == img_saveload
+                @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
 
-                open(io->ImageIO.save(Stream(fmt, io), img), joinpath(tmpdir, "test_io.pgm"), "w")
-                img_saveload = open(io->ImageIO.load(Stream(fmt, io)), joinpath(tmpdir, "test_io.pgm"))
+                open(io->ImageIO.save(Stream{fmt}(io), img), joinpath(tmpdir, "test_io.pgm"), "w")
+                img_saveload = open(io->ImageIO.load(Stream{fmt}(io)), joinpath(tmpdir, "test_io.pgm"))
                 @test img == img_saveload
+                @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
             end
         end
 
@@ -77,10 +83,12 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
                 ImageIO.save(f, img)
                 img_saveload = ImageIO.load(f)
                 @test img == img_saveload
+                @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
 
-                open(io->ImageIO.save(Stream(fmt, io), img), joinpath(tmpdir, "test_io.ppm"), "w")
-                img_saveload = open(io->ImageIO.load(Stream(fmt, io)), joinpath(tmpdir, "test_io.ppm"))
+                open(io->ImageIO.save(Stream{fmt}(io), img), joinpath(tmpdir, "test_io.ppm"), "w")
+                img_saveload = open(io->ImageIO.load(Stream{fmt}(io)), joinpath(tmpdir, "test_io.ppm"))
                 @test img == img_saveload
+                @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
             end
         end
     end
@@ -93,10 +101,12 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
                 ImageIO.save(f, img)
                 img_saveload = ImageIO.load(f)
                 @test img == img_saveload
+                @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
 
-                open(io->ImageIO.save(Stream(format"TIFF", io), img), joinpath(tmpdir, "test_io.tiff"), "w")
-                img_saveload = open(io->ImageIO.load(Stream(format"TIFF", io)), joinpath(tmpdir, "test_io.tiff"))
+                open(io->ImageIO.save(Stream{format"TIFF"}(io), img), joinpath(tmpdir, "test_io.tiff"), "w")
+                img_saveload = open(io->ImageIO.load(Stream{format"TIFF"}(io)), joinpath(tmpdir, "test_io.tiff"))
                 @test img == img_saveload
+                @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
             end
         end
     end
