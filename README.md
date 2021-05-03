@@ -10,6 +10,7 @@ Currently provides:
 - [PNGFiles.jl](https://github.com/JuliaIO/PNGFiles.jl) for Portable Network Graphics via libpng - ([Benchmark vs. ImageMagick & QuartzImageIO](https://github.com/JuliaIO/PNGFiles.jl/issues/1#issuecomment-586749654))
 - [Netpbm.jl](https://github.com/JuliaIO/Netpbm.jl) for Portable Bitmap formats (in pure Julia)
 - [TiffImages.jl](https://github.com/tlnagy/TiffImages.jl) for TIFFs (in pure Julia)
+- [OpenEXR.jl](https://github.com/twadleigh/OpenEXR.jl) for OpenEXR files (wrapping the C API provided by the [OpenEXR](https://github.com/AcademySoftwareFoundation/openexr) library)
 
 
 ## Installation

@@ -1,7 +1,7 @@
 using Test
 using ImageIO
 using FileIO: File, DataFormat, Stream, @format_str
-using ImageCore: N0f8, RGB, Gray
+using ImageCore: N0f8, RGB, Gray, RGBA
 
 tmpdir = mktempdir()
 Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), multithread tests will be disabled"
@@ -109,5 +109,16 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
                 @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
             end
         end
+    end
+
+    @testset "EXR" begin
+        for typ in [RGBA{Float16}]
+            img = rand(typ, 10, 10)
+            f = File{format"EXR"}(joinpath(tmpdir, "test_fpath.exr"))
+            ImageIO.save(f, img)
+            img_saveload = ImageIO.load(f)
+            @test img == img_saveload
+            @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
+        end 
     end
 end

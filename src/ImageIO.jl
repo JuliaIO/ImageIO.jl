@@ -6,6 +6,7 @@ using FileIO: File, DataFormat, Stream, stream, Formatted
 const idNetpbm = Base.PkgId(UUID("f09324ee-3d7c-5217-9330-fc30815ba969"), "Netpbm")
 const idPNGFiles = Base.PkgId(UUID("f57f5aa1-a3ce-4bc8-8ab9-96f992907883"), "PNGFiles")
 const idTiffImages = Base.PkgId(UUID("731e570b-9d59-4bfa-96dc-6df516fadf69"), "TiffImages")
+const idOpenEXR = Base.PkgId(UUID("52e1d378-f018-4a11-a4be-720524705ac7"), "OpenEXR")
 
 # Enforce a type conversion to be backend independent (issue #25)
 # Note: If the backend does not provide efficient `convert` implementation,
@@ -14,6 +15,7 @@ for FMT in (
     :PBMBinary, :PGMBinary, :PPMBinary, :PBMText, :PGMText, :PPMText,
     :TIFF,
     :PNG,
+    :EXR,
 )
     @eval canonical_type(::DataFormat{$(Expr(:quote, FMT))}, ::AbstractArray{T, N}) where {T,N} =
         Array{T,N}
@@ -117,6 +119,17 @@ function save(s::Stream{DataFormat{:TIFF}}, image::S; permute_horizontal=false, 
     else
         Base.invokelatest(checked_import(idTiffImages).save, stream(s), imgout)
     end
+end
+
+## OpenEXR
+
+function load(f::File{DataFormat{:EXR}}; kwargs...)
+    data = Base.invokelatest(checked_import(idOpenEXR).load, f, kwargs...)
+    return enforece_canonical_type(f, data)
+end
+
+function save(f::File{DataFormat{:EXR}}, args...; kwargs...)
+    Base.invokelatest(checked_import(idOpenEXR).save, f, args...; kwargs...)
 end
 
 ## Function names labelled for FileIO. Makes FileIO lookup quicker
