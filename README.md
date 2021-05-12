@@ -12,6 +12,7 @@ Currently provides:
 - [TiffImages.jl](https://github.com/tlnagy/TiffImages.jl) for TIFFs (in pure Julia)
 - [OpenEXR.jl](https://github.com/twadleigh/OpenEXR.jl) for OpenEXR files (wrapping the C API provided by the [OpenEXR](https://github.com/AcademySoftwareFoundation/openexr) library)
 - [QOI.jl](https://github.com/KristofferC/QOI.jl) for [QOI](https://qoiformat.org/) files (in pure Julia)
+- [Sixel.jl](https://github.com/johnnychen94/Sixel.jl) for DEC SIXEL graphics (wrapping the C API provided by [libsixel](https://github.com/libsixel/libsixel))
 
 
 ## Installation
