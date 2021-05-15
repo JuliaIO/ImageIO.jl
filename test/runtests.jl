@@ -2,6 +2,7 @@ using Test
 using ImageIO
 using FileIO: File, DataFormat, Stream, @format_str
 using ImageCore: N0f8, RGB, Gray
+using ImageQualityIndexes
 
 tmpdir = mktempdir()
 Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), multithread tests will be disabled"
@@ -106,6 +107,26 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
                 open(io->ImageIO.save(Stream{format"TIFF"}(io), img), joinpath(tmpdir, "test_io.tiff"), "w")
                 img_saveload = open(io->ImageIO.load(Stream{format"TIFF"}(io)), joinpath(tmpdir, "test_io.tiff"))
                 @test img == img_saveload
+                @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
+            end
+        end
+    end
+
+    @testset "sixel" begin
+        for typ in [Gray{N0f8}, Gray{Float64}, RGB{N0f8}, RGB{Float64}] # TODO: Add UInt8, N0f8 support in TiffImages
+            @testset "$typ sixel" begin
+                img = repeat(typ.(0:0.1:0.9), inner=(10, 50))
+                f = File{format"SIXEL"}(joinpath(tmpdir, "test_fpath.sixel"))
+                ImageIO.save(f, img)
+                img_saveload = ImageIO.load(f)
+                @test eltype(img_saveload) == RGB{N0f8} # currently Sixel forces eltype to be RGB{N0f8}
+                @test assess_psnr(img, eltype(img).(img_saveload)) > 30 # Sixel encode involves lossy quantization and dither operations
+                @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
+
+                open(io->ImageIO.save(Stream{format"SIXEL"}(io), img), joinpath(tmpdir, "test_io.sixel"), "w")
+                img_saveload = open(io->ImageIO.load(Stream{format"SIXEL"}(io)), joinpath(tmpdir, "test_io.sixel"))
+                @test eltype(img_saveload) == RGB{N0f8} # currently Sixel forces eltype to be RGB{N0f8}
+                @test assess_psnr(img, eltype(img).(img_saveload)) > 30 # Sixel encode involves lossy quantization and dither operations
                 @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
             end
         end
