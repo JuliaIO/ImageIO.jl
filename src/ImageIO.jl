@@ -50,25 +50,25 @@ function checked_import(pkgid)
 end
 
 function load(f::File{DataFormat{:PNG}}; kwargs...)
-    data = Base.invokelatest(checked_import(idPNGFiles).load, f.filename, kwargs...)
+    data = Base.invokelatest(checked_import(idPNGFiles).load, f.filename; kwargs...)
     return enforece_canonical_type(f, data)
 end
 function load(s::Stream{DataFormat{:PNG}}; kwargs...)
-    data = Base.invokelatest(checked_import(idPNGFiles).load, stream(s), kwargs...)
+    data = Base.invokelatest(checked_import(idPNGFiles).load, stream(s); kwargs...)
     return enforece_canonical_type(s, data)
 end
 
 function save(f::File{DataFormat{:PNG}}, image::S; kwargs...) where {T, S<:Union{AbstractMatrix, AbstractArray{T,3}}}
-    return Base.invokelatest(checked_import(idPNGFiles).save, f.filename, image, kwargs...)
+    return Base.invokelatest(checked_import(idPNGFiles).save, f.filename, image; kwargs...)
 end
 
 function save(s::Stream{DataFormat{:PNG}}, image::S; permute_horizontal=false, mapi=identity, kwargs...) where {T, S<:Union{AbstractMatrix, AbstractArray{T,3}}}
     imgout = map(mapi, image)
     if permute_horizontal
         perm = ndims(imgout) == 2 ? (2, 1) : ndims(imgout) == 3 ? (2, 1, 3) : error("$(ndims(imgout)) dims array is not supported")
-        return Base.invokelatest(checked_import(idPNGFiles).save, stream(s), PermutedDimsArray(imgout, perm), kwargs...)
+        return Base.invokelatest(checked_import(idPNGFiles).save, stream(s), PermutedDimsArray(imgout, perm); kwargs...)
     else
-        return Base.invokelatest(checked_import(idPNGFiles).save, stream(s), imgout, kwargs...)
+        return Base.invokelatest(checked_import(idPNGFiles).save, stream(s), imgout; kwargs...)
     end
 end
 
@@ -99,11 +99,11 @@ end
 ## TIFFs
 
 function load(f::File{DataFormat{:TIFF}}; kwargs...)
-    data = Base.invokelatest(checked_import(idTiffImages).load, f.filename, kwargs...)
+    data = Base.invokelatest(checked_import(idTiffImages).load, f.filename; kwargs...)
     return enforece_canonical_type(f, data)
 end
 function load(s::Stream{DataFormat{:TIFF}}; kwargs...)
-    data = Base.invokelatest(checked_import(idTiffImages).load, stream(s), kwargs...)
+    data = Base.invokelatest(checked_import(idTiffImages).load, stream(s); kwargs...)
     return enforece_canonical_type(s, data)
 end
 
@@ -124,7 +124,7 @@ end
 ## OpenEXR
 
 function load(f::File{DataFormat{:EXR}}; kwargs...)
-    data = Base.invokelatest(checked_import(idOpenEXR).load, f, kwargs...)
+    data = Base.invokelatest(checked_import(idOpenEXR).load, f; kwargs...)
     return enforece_canonical_type(f, data)
 end
 
