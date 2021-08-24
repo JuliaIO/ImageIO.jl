@@ -30,6 +30,12 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
                     @test img == img_saveload
                 end
                 @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
+                img_saveload = ImageIO.load(f; gamma=1.0)
+                if typ == UInt8
+                    @test all(img .== reinterpret(UInt8, img_saveload))
+                else
+                    @test img == img_saveload
+                end
 
                 open(io->ImageIO.save(Stream{format"PNG"}(io), img, permute_horizontal=false), joinpath(tmpdir, "test_io.png"), "w")
                 img_saveload = open(io->ImageIO.load(Stream{format"PNG"}(io)), joinpath(tmpdir, "test_io.png"))
@@ -39,6 +45,14 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
                     @test img == img_saveload
                 end
                 @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
+
+                ImageIO.save(f, img; compression_level=1)
+                img_saveload = ImageIO.load(f)
+                if typ == UInt8
+                    @test all(img .== reinterpret(UInt8, img_saveload))
+                else
+                    @test img == img_saveload
+                end
             end
         end
     end
@@ -102,6 +116,8 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
                 img_saveload = ImageIO.load(f)
                 @test img == img_saveload
                 @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
+                img_saveload = ImageIO.load(f; mmap=true)
+                @test img == reshape(img_saveload, size(img))
 
                 open(io->ImageIO.save(Stream{format"TIFF"}(io), img), joinpath(tmpdir, "test_io.tiff"), "w")
                 img_saveload = open(io->ImageIO.load(Stream{format"TIFF"}(io)), joinpath(tmpdir, "test_io.tiff"))
