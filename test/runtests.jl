@@ -137,4 +137,15 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
             @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
         end
     end
+
+    @testset "QOI" begin
+        for typ in [RGBA{N0f8}, RGB{N0f8}]
+            img = rand(typ, 10, 10)
+            f = File{format"QOI"}(joinpath(tmpdir, "test_fpath.qoi"))
+            ImageIO.save(f, img)
+            img_saveload = ImageIO.load(f)
+            @test img == img_saveload
+            @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
+        end
+    end
 end
