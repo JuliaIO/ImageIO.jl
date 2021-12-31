@@ -10,7 +10,7 @@ const idOpenEXR = Base.PkgId(UUID("52e1d378-f018-4a11-a4be-720524705ac7"), "Open
 
 # Enforce a type conversion to be backend independent (issue #25)
 # Note: If the backend does not provide efficient `convert` implementation,
-#       there will be an extra memeory allocation and thus hurt the performance.
+#       there will be an extra memory allocation and thus hurt the performance.
 for FMT in (
     :PBMBinary, :PGMBinary, :PPMBinary, :PBMText, :PGMText, :PPMText,
     :TIFF,
@@ -22,7 +22,7 @@ for FMT in (
 end
 @inline canonical_type(::Formatted{T}, data) where T = canonical_type(T(), data)
 
-function enforece_canonical_type(f, data)
+function enforce_canonical_type(f, data)
     AT = canonical_type(f, data)
     # This may not be type stable if `AT` is not a concrete type,
     # but it's not an issue for `load`; it can never be type stable.
@@ -51,11 +51,11 @@ end
 
 function load(f::File{DataFormat{:PNG}}; kwargs...)
     data = Base.invokelatest(checked_import(idPNGFiles).load, f.filename; kwargs...)
-    return enforece_canonical_type(f, data)
+    return enforce_canonical_type(f, data)
 end
 function load(s::Stream{DataFormat{:PNG}}; kwargs...)
     data = Base.invokelatest(checked_import(idPNGFiles).load, stream(s); kwargs...)
-    return enforece_canonical_type(s, data)
+    return enforce_canonical_type(s, data)
 end
 
 function save(f::File{DataFormat{:PNG}}, image::S; kwargs...) where {T, S<:Union{AbstractMatrix, AbstractArray{T,3}}}
@@ -78,12 +78,12 @@ for NETPBMFORMAT in (:PBMBinary, :PGMBinary, :PPMBinary, :PBMText, :PGMText, :PP
     @eval begin
         function load(f::File{DataFormat{$(Expr(:quote,NETPBMFORMAT))}})
             data = Base.invokelatest(checked_import(idNetpbm).load, f)
-            return enforece_canonical_type(f, data)
+            return enforce_canonical_type(f, data)
         end
 
         function load(s::Stream{DataFormat{$(Expr(:quote,NETPBMFORMAT))}})
             data = Base.invokelatest(checked_import(idNetpbm).load, s)
-            return enforece_canonical_type(s, data)
+            return enforce_canonical_type(s, data)
         end
 
         function save(f::File{DataFormat{$(Expr(:quote,NETPBMFORMAT))}}, image::S; kwargs...) where {S<:AbstractMatrix}
@@ -100,11 +100,11 @@ end
 
 function load(f::File{DataFormat{:TIFF}}; kwargs...)
     data = Base.invokelatest(checked_import(idTiffImages).load, f.filename; kwargs...)
-    return enforece_canonical_type(f, data)
+    return enforce_canonical_type(f, data)
 end
 function load(s::Stream{DataFormat{:TIFF}}; kwargs...)
     data = Base.invokelatest(checked_import(idTiffImages).load, stream(s); kwargs...)
-    return enforece_canonical_type(s, data)
+    return enforce_canonical_type(s, data)
 end
 
 function save(f::File{DataFormat{:TIFF}}, image::S) where {T, S<:Union{AbstractMatrix, AbstractArray{T,3}}}
@@ -125,7 +125,7 @@ end
 
 function load(f::File{DataFormat{:EXR}}; kwargs...)
     data = Base.invokelatest(checked_import(idOpenEXR).load, f; kwargs...)
-    return enforece_canonical_type(f, data)
+    return enforce_canonical_type(f, data)
 end
 
 function save(f::File{DataFormat{:EXR}}, args...; kwargs...)
