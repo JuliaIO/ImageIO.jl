@@ -11,6 +11,7 @@ Currently provides:
 - [Netpbm.jl](https://github.com/JuliaIO/Netpbm.jl) for Portable Bitmap formats (in pure Julia)
 - [TiffImages.jl](https://github.com/tlnagy/TiffImages.jl) for TIFFs (in pure Julia)
 - [OpenEXR.jl](https://github.com/twadleigh/OpenEXR.jl) for OpenEXR files (wrapping the C API provided by the [OpenEXR](https://github.com/AcademySoftwareFoundation/openexr) library)
+- [QOI.jl](https://github.com/KristofferC/QOI.jl) for [QOI](https://qoiformat.org/) files (in pure Julia)
 
 
 ## Installation
