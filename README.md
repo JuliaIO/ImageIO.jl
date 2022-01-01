@@ -2,7 +2,7 @@
 
 FileIO.jl integration for image files
 
-![Julia version](https://img.shields.io/badge/julia-%3E%3D%201.3-blue)
+![Julia version](https://img.shields.io/badge/julia-%3E%3D%201.6-blue)
 [![Run tests](https://github.com/JuliaIO/ImageIO.jl/actions/workflows/test.yml/badge.svg)](https://github.com/JuliaIO/ImageIO.jl/actions/workflows/test.yml)
 [![Codecov](https://codecov.io/gh/JuliaIO/ImageIO.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/JuliaIO/ImageIO.jl)
 
@@ -38,7 +38,7 @@ load("test.tiff")
 
 ## Compatibility
 
-This package requires Julia at least v1.3. For old Julia versions, a dummy ImageIO version v0.0.1 with no real function will be installed.
+If you're using old Julia versions (`VERSION < v"1.3"`), a dummy ImageIO version v0.0.1 with no real function will be installed.
 In this case, you still need to install [ImageMagick.jl] to make `FileIO.save`/`FileIO.load` work.
 
 [ImageMagick.jl]: https://github.com/JuliaIO/ImageMagick.jl
