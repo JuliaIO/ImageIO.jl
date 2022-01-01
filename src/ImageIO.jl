@@ -3,6 +3,7 @@ module ImageIO
 using UUIDs
 using FileIO: File, DataFormat, Stream, stream, Formatted
 
+const idSixel = Base.PkgId(UUID("45858cf5-a6b0-47a3-bbea-62219f50df47"), "Sixel")
 const idNetpbm = Base.PkgId(UUID("f09324ee-3d7c-5217-9330-fc30815ba969"), "Netpbm")
 const idPNGFiles = Base.PkgId(UUID("f57f5aa1-a3ce-4bc8-8ab9-96f992907883"), "PNGFiles")
 const idTiffImages = Base.PkgId(UUID("731e570b-9d59-4bfa-96dc-6df516fadf69"), "TiffImages")
@@ -18,6 +19,7 @@ for FMT in (
     :PNG,
     :EXR,
     :QOI,
+    :SIXEL,
 )
     @eval canonical_type(::DataFormat{$(Expr(:quote, FMT))}, ::AbstractArray{T, N}) where {T,N} =
         Array{T,N}
@@ -143,6 +145,23 @@ end
 
 function save(f::File{DataFormat{:QOI}}, args...; kwargs...)
     Base.invokelatest(checked_import(idQOI).qoi_encode, f.filename, args...; kwargs...)
+end
+
+## Sixel
+# Sixel.jl itself provides `fileio_load`/`fileio_save` so we simply delegate everything to it
+function load(f::File{DataFormat{:SIXEL}}; kwargs...)
+    data = Base.invokelatest(checked_import(idSixel).fileio_load, f, kwargs...)
+    return  enforce_canonical_type(f, data)
+end
+function load(s::Stream{DataFormat{:SIXEL}}; kwargs...)
+    data = Base.invokelatest(checked_import(idSixel).fileio_load, s, kwargs...)
+    return  enforce_canonical_type(s, data)
+end
+function save(f::File{DataFormat{:SIXEL}}, image::AbstractArray; kwargs...)
+    Base.invokelatest(checked_import(idSixel).fileio_save, f, image; kwargs...)
+end
+function save(s::Stream{DataFormat{:SIXEL}}, image::AbstractArray; kwargs...)
+    Base.invokelatest(checked_import(idSixel).fileio_save, s, image; kwargs...)
 end
 
 ## Function names labelled for FileIO. Makes FileIO lookup quicker
