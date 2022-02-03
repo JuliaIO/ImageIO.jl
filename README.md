@@ -8,6 +8,7 @@ FileIO.jl integration for image files
 
 | Format | Extensions | Provider | Implementation | Comment |
 | ------- | ---------- | -------- | ---- | ----------- |
+| JPEG | `.jpg`, `.jpeg` | [JpegTurbo.jl](https://github.com/johnnychen94/JpegTurbo.jl) | Julia wrapper of [libjpeg-turbo](https://github.com/libjpeg-turbo/libjpeg-turbo) | [Benchmark results against other backends](https://github.com/johnnychen94/JpegTurbo.jl/issues/15) |
 | [OpenEXR](https://www.openexr.com/) | `.exr` | [OpenEXR.jl](https://github.com/twadleigh/OpenEXR.jl) | Julia wrapper of [OpenEXR](https://github.com/AcademySoftwareFoundation/openexr) | |
 | Portable Bitmap formats | `.pbm`, `.pgm`, `.ppm` | [Netpbm.jl](https://github.com/JuliaIO/Netpbm.jl) | pure Julia | |
 | PNG (Portable Network Graphics) | `.png` | [PNGFiles.jl](https://github.com/JuliaIO/PNGFiles.jl) | Julia wrapper of [libpng](https://github.com/glennrp/libpng) | [Benchmark vs. ImageMagick & QuartzImageIO](https://github.com/JuliaIO/PNGFiles.jl/issues/1#issuecomment-586749654) |
