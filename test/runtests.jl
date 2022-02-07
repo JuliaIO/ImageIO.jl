@@ -1,7 +1,7 @@
 using Test
 using ImageIO
 using FileIO: File, DataFormat, Stream, @format_str
-using ImageCore: N0f8, RGB, Gray, RGBA, GrayA
+using ImageCore: N0f8, RGB, Gray, RGBA, GrayA, n0f8
 using ImageQualityIndexes
 
 tmpdir = mktempdir()
@@ -151,7 +151,7 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
     end
 
     @testset "sixel" begin
-        for typ in [Gray{N0f8}, Gray{Float64}, RGB{N0f8}, RGB{Float64}] # TODO: Add UInt8, N0f8 support in TiffImages
+        for typ in [Gray{N0f8}, Gray{Float64}, RGB{N0f8}, RGB{Float64}]
             @testset "$typ sixel" begin
                 img = repeat(typ.(0:0.1:0.9), inner=(10, 50))
                 f = File{format"SIXEL"}(joinpath(tmpdir, "test_fpath.sixel"))
@@ -165,6 +165,26 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
                 img_saveload = open(io->ImageIO.load(Stream{format"SIXEL"}(io)), joinpath(tmpdir, "test_io.sixel"))
                 @test eltype(img_saveload) == RGB{N0f8} # currently Sixel forces eltype to be RGB{N0f8}
                 @test assess_psnr(img, eltype(img).(img_saveload)) > 30 # Sixel encode involves lossy quantization and dither operations
+                @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
+            end
+        end
+    end
+
+    @testset "JPEG" begin
+        for typ in [Gray{N0f8}, Gray{Float64}, RGB{N0f8}, RGB{Float64}]
+            @testset "$typ JPEG" begin
+                img = repeat(typ.(0:0.1:0.9), inner=(10, 50))
+                f = File{format"JPEG"}(joinpath(tmpdir, "test_fpath.jpg"))
+                ImageIO.save(f, img)
+                img_saveload = ImageIO.load(f)
+                @test eltype(img_saveload) == n0f8(typ) # JpegTurbo uses 8bit
+                @test assess_psnr(img, eltype(img).(img_saveload)) > 51
+                @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
+
+                open(io->ImageIO.save(Stream{format"JPEG"}(io), img), joinpath(tmpdir, "test_io.jpg"), "w")
+                img_saveload = open(io->ImageIO.load(Stream{format"JPEG"}(io)), joinpath(tmpdir, "test_io.jpg"))
+                @test eltype(img_saveload) == n0f8(typ) # JpegTurbo uses 8bit
+                @test assess_psnr(img, eltype(img).(img_saveload)) > 51
                 @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
             end
         end
