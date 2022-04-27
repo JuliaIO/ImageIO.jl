@@ -3,6 +3,8 @@ module ImageIO
 using UUIDs
 using FileIO: File, DataFormat, Stream, stream, Formatted
 
+import IndirectArrays: IndirectArray
+
 const idSixel = Base.PkgId(UUID("45858cf5-a6b0-47a3-bbea-62219f50df47"), "Sixel")
 const idNetpbm = Base.PkgId(UUID("f09324ee-3d7c-5217-9330-fc30815ba969"), "Netpbm")
 const idPNGFiles = Base.PkgId(UUID("f57f5aa1-a3ce-4bc8-8ab9-96f992907883"), "PNGFiles")
@@ -17,7 +19,6 @@ const idJpegTurbo = Base.PkgId(UUID("b835a17e-a41a-41e7-81f0-2f016b05efe0"), "Jp
 for FMT in (
     :PBMBinary, :PGMBinary, :PPMBinary, :PBMText, :PGMText, :PPMText,
     :TIFF,
-    :PNG,
     :EXR,
     :QOI,
     :SIXEL,
@@ -26,6 +27,7 @@ for FMT in (
     @eval canonical_type(::DataFormat{$(Expr(:quote, FMT))}, ::AbstractArray{T, N}) where {T,N} =
         Array{T,N}
 end
+@inline canonical_type(::DataFormat{:PNG}, ::AbstractArray{T, N}) where {T,N} = Union{Array{T,N}, IndirectArray{T,N}}
 @inline canonical_type(::Formatted{T}, data) where T = canonical_type(T(), data)
 
 function enforce_canonical_type(f, data)

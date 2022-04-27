@@ -2,6 +2,7 @@ using Test
 using ImageIO
 using FileIO: File, DataFormat, Stream, @format_str
 using ImageCore: N0f8, RGB, Gray, RGBA, GrayA, n0f8
+using IndirectArrays
 using ImageQualityIndexes
 
 tmpdir = mktempdir()
@@ -30,7 +31,7 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
                 else
                     @test img == img_saveload
                 end
-                @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
+                @test img_saveload isa Array
                 img_saveload = ImageIO.load(f; gamma=1.0)
                 if typ == UInt8
                     @test all(img .== reinterpret(UInt8, img_saveload))
@@ -45,7 +46,7 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
                 else
                     @test img == img_saveload
                 end
-                @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
+                @test img_saveload isa Array
 
                 ImageIO.save(f, img; compression_level=1)
                 img_saveload = ImageIO.load(f)
@@ -55,6 +56,16 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
                     @test img == img_saveload
                 end
             end
+        end
+
+        @testset "indexed image" begin
+            f = File{DataFormat{:PNG}}(joinpath(tmpdir, "test_fpath.png"))
+            img = IndirectArray(rand(1:5, 4, 4), rand(RGB{N0f8}, 5))
+            ImageIO.save(f, img)
+            img_saveload = ImageIO.load(f)
+
+            @test img == img_saveload
+            @test img isa IndirectArray
         end
     end
 

@@ -5,6 +5,7 @@ version = "0.6.1"
 
 [deps]
 FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
+IndirectArrays = "9b13fd28-a010-5f03-acff-a1bbcff69959"
 JpegTurbo = "b835a17e-a41a-41e7-81f0-2f016b05efe0"
 Netpbm = "f09324ee-3d7c-5217-9330-fc30815ba969"
 OpenEXR = "52e1d378-f018-4a11-a4be-720524705ac7"
@@ -16,8 +17,9 @@ UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 
 [compat]
 FileIO = "1.2"
-JpegTurbo = "0.1"
+IndirectArrays = "0.5, 1"
 ImageCore = "0.8.1, 0.9"
+JpegTurbo = "0.1"
 Netpbm = "1.0"
 OpenEXR = "0.3"
 PNGFiles = "0.3"
