@@ -5,7 +5,7 @@ using FileIO: File, DataFormat, Stream, stream, Formatted
 
 import IndirectArrays: IndirectArray
 
-using LazyModules
+using LazyModules # @lazy macro is used to delay the package loading to its first usage
 
 @lazy import Sixel
 @lazy import Netpbm
