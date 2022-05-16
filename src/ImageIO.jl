@@ -5,13 +5,15 @@ using FileIO: File, DataFormat, Stream, stream, Formatted
 
 import IndirectArrays: IndirectArray
 
-const idSixel = Base.PkgId(UUID("45858cf5-a6b0-47a3-bbea-62219f50df47"), "Sixel")
-const idNetpbm = Base.PkgId(UUID("f09324ee-3d7c-5217-9330-fc30815ba969"), "Netpbm")
-const idPNGFiles = Base.PkgId(UUID("f57f5aa1-a3ce-4bc8-8ab9-96f992907883"), "PNGFiles")
-const idTiffImages = Base.PkgId(UUID("731e570b-9d59-4bfa-96dc-6df516fadf69"), "TiffImages")
-const idOpenEXR = Base.PkgId(UUID("52e1d378-f018-4a11-a4be-720524705ac7"), "OpenEXR")
-const idQOI = Base.PkgId(UUID("4b34888f-f399-49d4-9bb3-47ed5cae4e65"), "QOI")
-const idJpegTurbo = Base.PkgId(UUID("b835a17e-a41a-41e7-81f0-2f016b05efe0"), "JpegTurbo")
+using LazyModules # @lazy macro is used to delay the package loading to its first usage
+
+@lazy import Sixel = "45858cf5-a6b0-47a3-bbea-62219f50df47"
+@lazy import Netpbm = "f09324ee-3d7c-5217-9330-fc30815ba969"
+@lazy import PNGFiles = "f57f5aa1-a3ce-4bc8-8ab9-96f992907883"
+@lazy import TiffImages = "731e570b-9d59-4bfa-96dc-6df516fadf69"
+@lazy import OpenEXR = "52e1d378-f018-4a11-a4be-720524705ac7"
+@lazy import QOI = "4b34888f-f399-49d4-9bb3-47ed5cae4e65"
+@lazy import JpegTurbo = "b835a17e-a41a-41e7-81f0-2f016b05efe0"
 
 # Enforce a type conversion to be backend independent (issue #25)
 # Note: If the backend does not provide efficient `convert` implementation,
@@ -48,35 +50,27 @@ end
 
 ## PNGs
 
-const load_locker = Threads.ReentrantLock()
-function checked_import(pkgid)
-    Base.root_module_exists(pkgid) && return Base.root_module(pkgid)
-    # If not available, lock and load the library in a sequential order
-    lock(load_locker) do
-        Base.require(pkgid)
-    end
-end
 
 function load(f::File{DataFormat{:PNG}}; kwargs...)
-    data = Base.invokelatest(checked_import(idPNGFiles).load, f.filename; kwargs...)
+    data = PNGFiles.load(f.filename; kwargs...)
     return enforce_canonical_type(f, data)
 end
 function load(s::Stream{DataFormat{:PNG}}; kwargs...)
-    data = Base.invokelatest(checked_import(idPNGFiles).load, stream(s); kwargs...)
+    data = PNGFiles.load(stream(s); kwargs...)
     return enforce_canonical_type(s, data)
 end
 
 function save(f::File{DataFormat{:PNG}}, image::S; kwargs...) where {T, S<:Union{AbstractMatrix, AbstractArray{T,3}}}
-    return Base.invokelatest(checked_import(idPNGFiles).save, f.filename, image; kwargs...)
+    PNGFiles.save(f.filename, image; kwargs...)
 end
 
 function save(s::Stream{DataFormat{:PNG}}, image::S; permute_horizontal=false, mapi=identity, kwargs...) where {T, S<:Union{AbstractMatrix, AbstractArray{T,3}}}
     imgout = map(mapi, image)
     if permute_horizontal
         perm = ndims(imgout) == 2 ? (2, 1) : ndims(imgout) == 3 ? (2, 1, 3) : error("$(ndims(imgout)) dims array is not supported")
-        return Base.invokelatest(checked_import(idPNGFiles).save, stream(s), PermutedDimsArray(imgout, perm); kwargs...)
+        PNGFiles.save(stream(s), PermutedDimsArray(imgout, perm); kwargs...)
     else
-        return Base.invokelatest(checked_import(idPNGFiles).save, stream(s), imgout; kwargs...)
+        PNGFiles.save(stream(s), imgout; kwargs...)
     end
 end
 
@@ -85,21 +79,21 @@ end
 for NETPBMFORMAT in (:PBMBinary, :PGMBinary, :PPMBinary, :PBMText, :PGMText, :PPMText)
     @eval begin
         function load(f::File{DataFormat{$(Expr(:quote,NETPBMFORMAT))}})
-            data = Base.invokelatest(checked_import(idNetpbm).load, f)
+            data = Netpbm.load(f)
             return enforce_canonical_type(f, data)
         end
 
         function load(s::Stream{DataFormat{$(Expr(:quote,NETPBMFORMAT))}})
-            data = Base.invokelatest(checked_import(idNetpbm).load, s)
+            data = Netpbm.load(s)
             return enforce_canonical_type(s, data)
         end
 
         function save(f::File{DataFormat{$(Expr(:quote,NETPBMFORMAT))}}, image::S; kwargs...) where {S<:AbstractMatrix}
-            return Base.invokelatest(checked_import(idNetpbm).save, f, image; kwargs...)
+            return Netpbm.save(f, image; kwargs...)
         end
 
         function save(s::Stream{DataFormat{$(Expr(:quote,NETPBMFORMAT))}}, image::S; kwargs...) where {S<:AbstractMatrix}
-            return Base.invokelatest(checked_import(idNetpbm).save, s, image; kwargs...)
+            return Netpbm.save(s, image; kwargs...)
         end
     end
 end
@@ -107,81 +101,81 @@ end
 ## TIFFs
 
 function load(f::File{DataFormat{:TIFF}}; kwargs...)
-    data = Base.invokelatest(checked_import(idTiffImages).load, f.filename; kwargs...)
+    data = TiffImages.load(f.filename; kwargs...)
     return enforce_canonical_type(f, data)
 end
 function load(s::Stream{DataFormat{:TIFF}}; kwargs...)
-    data = Base.invokelatest(checked_import(idTiffImages).load, stream(s); kwargs...)
+    data = TiffImages.load(stream(s); kwargs...)
     return enforce_canonical_type(s, data)
 end
 
 function save(f::File{DataFormat{:TIFF}}, image::S) where {T, S<:Union{AbstractMatrix, AbstractArray{T,3}}}
-    Base.invokelatest(checked_import(idTiffImages).save, f.filename, image)
+    TiffImages.save(f.filename, image)
 end
 
 function save(s::Stream{DataFormat{:TIFF}}, image::S; permute_horizontal=false, mapi=identity) where {T, S<:Union{AbstractMatrix, AbstractArray{T,3}}}
     imgout = map(mapi, image)
     if permute_horizontal
         perm = ndims(imgout) == 2 ? (2, 1) : ndims(imgout) == 3 ? (2, 1, 3) : error("$(ndims(imgout)) dims array is not supported")
-        Base.invokelatest(checked_import(idTiffImages).save, stream(s), PermutedDimsArray(imgout, perm))
+        TiffImages.save(stream(s), PermutedDimsArray(imgout, perm))
     else
-        Base.invokelatest(checked_import(idTiffImages).save, stream(s), imgout)
+        TiffImages.save(stream(s), imgout)
     end
 end
 
 ## OpenEXR
 
 function load(f::File{DataFormat{:EXR}}; kwargs...)
-    data = Base.invokelatest(checked_import(idOpenEXR).load, f; kwargs...)
+    data = OpenEXR.load(f; kwargs...)
     return enforce_canonical_type(f, data)
 end
 
 function save(f::File{DataFormat{:EXR}}, args...; kwargs...)
-    Base.invokelatest(checked_import(idOpenEXR).save, f, args...; kwargs...)
+    OpenEXR.save(f, args...; kwargs...)
 end
 
 ## QOI
 
 function load(f::File{DataFormat{:QOI}}; kwargs...)
-    data = Base.invokelatest(checked_import(idQOI).qoi_decode, f.filename; kwargs...)
+    data = QOI.qoi_decode(f.filename; kwargs...)
     return enforce_canonical_type(f, data)
 end
 
 function save(f::File{DataFormat{:QOI}}, args...; kwargs...)
-    Base.invokelatest(checked_import(idQOI).qoi_encode, f.filename, args...; kwargs...)
+    QOI.qoi_encode(f.filename, args...; kwargs...)
 end
 
 ## Sixel
 # Sixel.jl itself provides `fileio_load`/`fileio_save` so we simply delegate everything to it
 function load(f::File{DataFormat{:SIXEL}}; kwargs...)
-    data = Base.invokelatest(checked_import(idSixel).fileio_load, f, kwargs...)
+    data = Sixel.fileio_load(f, kwargs...)
     return  enforce_canonical_type(f, data)
 end
 function load(s::Stream{DataFormat{:SIXEL}}; kwargs...)
-    data = Base.invokelatest(checked_import(idSixel).fileio_load, s, kwargs...)
+    data = Sixel.fileio_load(s, kwargs...)
     return  enforce_canonical_type(s, data)
 end
 function save(f::File{DataFormat{:SIXEL}}, image::AbstractArray; kwargs...)
-    Base.invokelatest(checked_import(idSixel).fileio_save, f, image; kwargs...)
+    Sixel.fileio_save(f, image; kwargs...)
 end
 function save(s::Stream{DataFormat{:SIXEL}}, image::AbstractArray; kwargs...)
-    Base.invokelatest(checked_import(idSixel).fileio_save, s, image; kwargs...)
+    Sixel.fileio_save(s, image; kwargs...)
 end
 
 ## JPEG
 function load(f::File{DataFormat{:JPEG}}; kwargs...)
-    data = Base.invokelatest(checked_import(idJpegTurbo).fileio_load, f, kwargs...)
+    data = JpegTurbo.fileio_load(f, kwargs...)
     return enforce_canonical_type(f, data)
 end
 function load(s::Stream{DataFormat{:JPEG}}; kwargs...)
-    data = Base.invokelatest(checked_import(idJpegTurbo).fileio_load, s, kwargs...)
+    data = JpegTurbo.fileio_load(s, kwargs...)
     return enforce_canonical_type(s, data)
 end
 function save(f::File{DataFormat{:JPEG}}, image::AbstractArray; kwargs...)
-    Base.invokelatest(checked_import(idJpegTurbo).fileio_save, f, image; kwargs...)
+    JpegTurbo.fileio_save(f, image; kwargs...)
 end
 function save(s::Stream{DataFormat{:JPEG}}, image::AbstractArray; kwargs...)
-    Base.invokelatest(checked_import(idJpegTurbo).fileio_save, s, image; kwargs...)
+    JpegTurbo.fileio_save(s, image; kwargs...)
 end
 
 ## Function names labelled for FileIO. Makes FileIO lookup quicker
