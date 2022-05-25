@@ -48,6 +48,12 @@ function enforce_canonical_type(f, data)
     end
 end
 
+# For lazy loads by either of
+#   load(io; mmap=true)
+#   load(io; lazyio=true)
+# do not canonicalize by default. A package that supports both is TiffImages v0.6+.
+uses_lazy(kwargs) = get(kwargs, :mmap, false) || get(kwargs, :lazyio, false)
+
 ## PNGs
 
 
@@ -100,13 +106,15 @@ end
 
 ## TIFFs
 
-function load(f::File{DataFormat{:TIFF}}; kwargs...)
+function load(f::File{DataFormat{:TIFF}}; canonicalize::Union{Bool,Nothing}=nothing, kwargs...)
+    canonicalize = something(canonicalize, !uses_lazy(kwargs))
     data = TiffImages.load(f.filename; kwargs...)
-    return enforce_canonical_type(f, data)
+    return canonicalize ? enforce_canonical_type(f, data) : data
 end
-function load(s::Stream{DataFormat{:TIFF}}; kwargs...)
+function load(s::Stream{DataFormat{:TIFF}}; canonicalize::Union{Bool,Nothing}=nothing, kwargs...)
+    canonicalize = something(canonicalize, !uses_lazy(kwargs))
     data = TiffImages.load(stream(s); kwargs...)
-    return enforce_canonical_type(s, data)
+    return canonicalize ? enforce_canonical_type(s, data) : data
 end
 
 function save(f::File{DataFormat{:TIFF}}, image::S) where {T, S<:Union{AbstractMatrix, AbstractArray{T,3}}}

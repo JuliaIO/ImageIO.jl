@@ -135,6 +135,16 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
                 img_saveload = open(io->ImageIO.load(Stream{format"TIFF"}(io)), joinpath(tmpdir, "test_io.tiff"))
                 @test img == img_saveload
                 @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
+
+                # mmapped images should not canonicalize by default, and can be controlled manually
+                img_saveload = ImageIO.load(f; mmap=true)
+                @test typeof(img_saveload) != ImageIO.canonical_type(f, img_saveload)
+                img_saveload = ImageIO.load(f; canonicalize=false)
+                @test typeof(img_saveload) != ImageIO.canonical_type(f, img_saveload)
+                img_saveload = open(io->ImageIO.load(Stream{format"TIFF"}(io); mmap=true), joinpath(tmpdir, "test_io.tiff"))
+                @test typeof(img_saveload) != ImageIO.canonical_type(f, img_saveload)
+                img_saveload = open(io->ImageIO.load(Stream{format"TIFF"}(io); canonicalize=false), joinpath(tmpdir, "test_io.tiff"))
+                @test typeof(img_saveload) != ImageIO.canonical_type(f, img_saveload)
             end
         end
     end
