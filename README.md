@@ -37,6 +37,13 @@ save("test.tiff", rand(RGB, 100, 100))
 load("test.tiff")
 ```
 
+## Canonicalization
+
+Some image loaders may return custom AbstractArray types. By default, this package "canonicalizes" the returned type to be either `Array` or [`IndirectArray`](https://github.com/JuliaArrays/IndirectArrays.jl).
+An exception is for calls like `load(filename; mmap=true)` where the image data will be "lazily" loaded using [memory-mapped IO](https://en.wikipedia.org/wiki/Memory-mapped_I/O), in which case the default is to allow the lower-level I/O package to return whatever AbstractArray type it chooses.
+
+You can manually control canonicalization with `load(filename; canonicalize=tf)` where `tf` is `true` or `false`.
+
 ## Compatibility
 
 If you're using old Julia versions (`VERSION < v"1.3"`), a dummy ImageIO version v0.0.1 with no real function will be installed.
