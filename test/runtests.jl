@@ -210,4 +210,18 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
             end
         end
     end
+
+    @testset "GIF" begin
+        for typ in [Gray{N0f8}, Gray{Float64}, RGB{N0f8}, RGB{Float64}]
+            @testset "$typ GIF" begin
+                img = repeat(typ.(0:0.1:0.9), inner=(10, 50))
+                f = File{format"GIF"}(joinpath(tmpdir, "test_fpath.gif"))
+                ImageIO.save(f, img)
+                img_saveload = ImageIO.load(f)
+                @test eltype(img_saveload) == n0f8(typ)
+                @test assess_psnr(img, eltype(img).(img_saveload)) > 51
+                @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
+            end
+        end
+    end
 end

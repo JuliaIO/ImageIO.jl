@@ -14,6 +14,7 @@ using LazyModules # @lazy macro is used to delay the package loading to its firs
 @lazy import OpenEXR = "52e1d378-f018-4a11-a4be-720524705ac7"
 @lazy import QOI = "4b34888f-f399-49d4-9bb3-47ed5cae4e65"
 @lazy import JpegTurbo = "b835a17e-a41a-41e7-81f0-2f016b05efe0"
+@lazy import GIFImages = "7064036c-d33e-4a25-b247-cf6150d8ad81"
 
 # Enforce a type conversion to be backend independent (issue #25)
 # Note: If the backend does not provide efficient `convert` implementation,
@@ -24,7 +25,8 @@ for FMT in (
     :EXR,
     :QOI,
     :SIXEL,
-    :JPEG
+    :JPEG,
+    :GIF
 )
     @eval canonical_type(::DataFormat{$(Expr(:quote, FMT))}, ::AbstractArray{T, N}) where {T,N} =
         Array{T,N}
@@ -184,6 +186,19 @@ function save(f::File{DataFormat{:JPEG}}, image::AbstractArray; kwargs...)
 end
 function save(s::Stream{DataFormat{:JPEG}}, image::AbstractArray; kwargs...)
     JpegTurbo.fileio_save(s, image; kwargs...)
+end
+
+# GIF
+function load(f::File{DataFormat{:GIF}}; kwargs...)
+    data = GIFImages.fileio_load(f, kwargs...)
+    return enforce_canonical_type(f, data)
+end
+function load(s::Stream{DataFormat{:GIF}}; kwargs...)
+    data = GIFImages.fileio_load(s, kwargs...)
+    return enforce_canonical_type(s, data)
+end
+function save(f::File{DataFormat{:GIF}}, image::AbstractArray; kwargs...)
+    GIFImages.fileio_save(f, image; kwargs...)
 end
 
 ## Function names labelled for FileIO. Makes FileIO lookup quicker

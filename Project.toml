@@ -5,6 +5,7 @@ version = "0.6.6"
 
 [deps]
 FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
+GIFImages = "7064036c-d33e-4a25-b247-cf6150d8ad81"
 IndirectArrays = "9b13fd28-a010-5f03-acff-a1bbcff69959"
 JpegTurbo = "b835a17e-a41a-41e7-81f0-2f016b05efe0"
 LazyModules = "8cdb02fc-e678-4876-92c5-9defec4f444e"
@@ -18,6 +19,7 @@ UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 
 [compat]
 FileIO = "1.2"
+GIFImages = "0.1"
 ImageCore = "0.8.1, 0.9"
 IndirectArrays = "0.5, 1"
 JpegTurbo = "0.1"
