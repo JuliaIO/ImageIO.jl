@@ -1,7 +1,7 @@
 name = "ImageIO"
 uuid = "82e4d734-157c-48bb-816b-45c225c6df19"
 authors = ["Ian Butterworth"]
-version = "0.6.6"
+version = "0.6.7"
 
 [deps]
 FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
@@ -18,7 +18,7 @@ UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 
 [compat]
 FileIO = "1.2"
-ImageCore = "0.8.1, 0.9"
+ImageCore = "0.8.1, 0.9, 0.10"
 IndirectArrays = "0.5, 1"
 JpegTurbo = "0.1"
 LazyModules = "0.3"
