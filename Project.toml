@@ -27,7 +27,7 @@ OpenEXR = "0.3"
 PNGFiles = "0.3, 0.4"
 QOI = "1"
 Sixel = "0.1.2"
-TiffImages = "0.3, 0.4, 0.5, 0.6, 0.7, 0.8"
+TiffImages = "0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9"
 julia = "1.6"
 
 [extras]
