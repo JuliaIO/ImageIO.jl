@@ -8,12 +8,12 @@ jobs:
     - uses: julia-actions/setup-julia@v1
       with:
         version: 'nightly'
-    - uses: actions/checkout@v4.1.2
+    - uses: actions/checkout@v4.1.3
     - uses: julia-actions/julia-buildpkg@latest
     - uses: julia-actions/julia-invalidations@v1
       id: invs_pr
     
-    - uses: actions/checkout@v4.1.2
+    - uses: actions/checkout@v4.1.3
       with:
         ref: 'master'
     - uses: julia-actions/julia-buildpkg@latest
