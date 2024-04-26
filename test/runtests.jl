@@ -123,7 +123,7 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
         for typ in [Gray{N0f8}, Gray{Float64}, RGB{N0f8}, RGB{Float64}] # TODO: Add UInt8, N0f8 support in TiffImages
             @testset "$typ TIFF" begin
                 img = rand(typ, 10, 10)
-                f = File{format"TIFF"}(joinpath(tmpdir, "test_fpath.tiff"))
+                f = File{format"TIFF"}(joinpath(tmpdir, "test_fpath_$(typ).tiff"))
                 ImageIO.save(f, img)
                 img_saveload = ImageIO.load(f)
                 @test img == img_saveload
@@ -131,8 +131,8 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
                 img_saveload = ImageIO.load(f; mmap=true)
                 @test img == reshape(img_saveload, size(img))
 
-                open(io->ImageIO.save(Stream{format"TIFF"}(io), img), joinpath(tmpdir, "test_io.tiff"), "w")
-                img_saveload = open(io->ImageIO.load(Stream{format"TIFF"}(io)), joinpath(tmpdir, "test_io.tiff"))
+                open(io->ImageIO.save(Stream{format"TIFF"}(io), img), joinpath(tmpdir, "test_io_$(typ).tiff"), "w")
+                img_saveload = open(io->ImageIO.load(Stream{format"TIFF"}(io)), joinpath(tmpdir, "test_io_$(typ).tiff"))
                 @test img == img_saveload
                 @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
 
@@ -141,9 +141,9 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
                 @test typeof(img_saveload) != ImageIO.canonical_type(f, img_saveload)
                 img_saveload = ImageIO.load(f; canonicalize=false)
                 @test typeof(img_saveload) != ImageIO.canonical_type(f, img_saveload)
-                img_saveload = open(io->ImageIO.load(Stream{format"TIFF"}(io); mmap=true), joinpath(tmpdir, "test_io.tiff"))
+                img_saveload = open(io->ImageIO.load(Stream{format"TIFF"}(io); mmap=true), joinpath(tmpdir, "test_io_$(typ).tiff"))
                 @test typeof(img_saveload) != ImageIO.canonical_type(f, img_saveload)
-                img_saveload = open(io->ImageIO.load(Stream{format"TIFF"}(io); canonicalize=false), joinpath(tmpdir, "test_io.tiff"))
+                img_saveload = open(io->ImageIO.load(Stream{format"TIFF"}(io); canonicalize=false), joinpath(tmpdir, "test_io_$(typ).tiff"))
                 @test typeof(img_saveload) != ImageIO.canonical_type(f, img_saveload)
             end
         end
