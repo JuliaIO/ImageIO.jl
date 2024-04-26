@@ -3,7 +3,7 @@
 FileIO.jl integration for image files
 
 ![Julia version](https://img.shields.io/badge/julia-%3E%3D%201.6-blue)
-[![Run tests](https://github.com/JuliaIO/ImageIO.jl/actions/workflows/test.yml/badge.svg)](https://github.com/JuliaIO/ImageIO.jl/actions/workflows/test.yml)
+[![CI](https://github.com/JuliaIO/ImageIO.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/JuliaIO/ImageIO.jl/actions/workflows/CI.yml)
 [![Codecov](https://codecov.io/gh/JuliaIO/ImageIO.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/JuliaIO/ImageIO.jl)
 
 | Format | Extensions | Provider | Implementation | Comment |
