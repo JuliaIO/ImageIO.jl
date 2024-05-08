@@ -15,6 +15,7 @@ QOI = "4b34888f-f399-49d4-9bb3-47ed5cae4e65"
 Sixel = "45858cf5-a6b0-47a3-bbea-62219f50df47"
 TiffImages = "731e570b-9d59-4bfa-96dc-6df516fadf69"
 UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
+WebP = "e3aaa7dc-3e4b-44e0-be63-ffb868ccd7c1"
 
 [compat]
 FileIO = "1.2"
@@ -28,6 +29,7 @@ PNGFiles = "0.3, 0.4"
 QOI = "1"
 Sixel = "0.1.2"
 TiffImages = "0.3, 0.4, 0.5, 0.6, 0.7, 0.8"
+WebP = "0.1.2"
 julia = "1.6"
 
 [extras]

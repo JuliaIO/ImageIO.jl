@@ -15,7 +15,7 @@ FileIO.jl integration for image files
 | [QOI (Quite Okay Image)](https://qoiformat.org/) format | `.qoi` | [QOI.jl](https://github.com/KristofferC/QOI.jl) | pure Julia | |
 | DEC SIXEL (six-pixels) graphics | `.six`, `.sixel` | [Sixel.jl](https://github.com/johnnychen94/Sixel.jl) | Julia wrapper of [libsixel](https://github.com/libsixel/libsixel) | |
 | TIFF (Tag Image File Format) | `.tiff`, `.tif` | [TiffImages.jl](https://github.com/tlnagy/TiffImages.jl) | pure Julia | check [OMETIFF.jl](https://github.com/tlnagy/OMETIFF.jl) for OMETIFF support |
-
+| WebP | `.webp` | [WebP.jl](https://github.com/stemann/WebP.jl) | Julia wrapper of [libwebp](https://developers.google.com/speed/webp/docs/api) | |
 
 ## Installation
 

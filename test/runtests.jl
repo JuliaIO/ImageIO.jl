@@ -210,4 +210,22 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
             end
         end
     end
+
+    @testset "WebP" begin
+        for typ in [RGBA{N0f8}, RGB{N0f8}]
+            @testset "$typ JPEG" begin
+                img = rand(typ, 10, 10)
+                f = File{format"WebP"}(joinpath(tmpdir, "test_fpath.webp"))
+                ImageIO.save(f, img)
+                img_saveload = ImageIO.load(f)
+                @test eltype(img_saveload) == n0f8(typ) # WebP uses 8bit
+                @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
+
+                open(io->ImageIO.save(Stream{format"WebP"}(io), img), joinpath(tmpdir, "test_io.webp"), "w")
+                img_saveload = open(io->ImageIO.load(Stream{format"WebP"}(io)), joinpath(tmpdir, "test_io.webp"))
+                @test eltype(img_saveload) == n0f8(typ) # WebP uses 8bit
+                @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
+            end
+        end
+    end
 end
