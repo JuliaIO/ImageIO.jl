@@ -1,7 +1,7 @@
 name = "ImageIO"
 uuid = "82e4d734-157c-48bb-816b-45c225c6df19"
 authors = ["Ian Butterworth"]
-version = "0.6.7"
+version = "0.6.8"
 
 [deps]
 FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
@@ -27,7 +27,7 @@ OpenEXR = "0.3"
 PNGFiles = "0.3, 0.4"
 QOI = "1"
 Sixel = "0.1.2"
-TiffImages = "0.3, 0.4, 0.5, 0.6, 0.7, 0.8"
+TiffImages = "0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.10"
 julia = "1.6"
 
 [extras]
