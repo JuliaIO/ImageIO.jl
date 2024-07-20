@@ -213,7 +213,7 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
 
     @testset "WebP" begin
         for typ in [RGBA{N0f8}, RGB{N0f8}]
-            @testset "$typ JPEG" begin
+            @testset "$typ WEBP" begin
                 img = rand(typ, 10, 10)
                 f = File{format"WebP"}(joinpath(tmpdir, "test_fpath.webp"))
                 ImageIO.save(f, img)
