@@ -23,19 +23,37 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - '1.6'
           - '1'
-          - 'nightly'
+          - lts
+          - '1.6'
         os:
           - ubuntu-latest
-          - macOS-latest
+          - macOS-latest # aarch64 runner
+          - macOS-13 # x64 runner
           - windows-latest
         arch:
           - x64
+          - aarch64
           - x86
         exclude:
+          - os: macOS-13
+            arch: aarch64
+          - os: macOS-latest
+            arch: x64
+          - os: macOS-latest
+            version: '1.6'
           - os: macOS-latest
             arch: x86
+          - os: macOS-13
+            arch: x86
+          - os: ubuntu-latest
+            arch: aarch64
+          - os: windows-latest
+            arch: aarch64
+        include:
+          - os: ubuntu-latest
+            arch: x64
+            version: nightly
     steps:
       - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@v2
