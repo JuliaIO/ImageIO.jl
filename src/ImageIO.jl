@@ -15,6 +15,7 @@ using LazyModules # @lazy macro is used to delay the package loading to its firs
 @lazy import QOI = "4b34888f-f399-49d4-9bb3-47ed5cae4e65"
 @lazy import JpegTurbo = "b835a17e-a41a-41e7-81f0-2f016b05efe0"
 @lazy import WebP = "e3aaa7dc-3e4b-44e0-be63-ffb868ccd7c1"
+@lazy import PCXFiles = "411fd99a-28e7-49b1-8433-4b90c1ef5e5e"
 
 # Enforce a type conversion to be backend independent (issue #25)
 # Note: If the backend does not provide efficient `convert` implementation,
@@ -27,6 +28,7 @@ for FMT in (
     :SIXEL,
     :JPEG,
     :WebP,
+    :PCX,
 )
     @eval canonical_type(::DataFormat{$(Expr(:quote, FMT))}, ::AbstractArray{T, N}) where {T,N} =
         Array{T,N}
@@ -202,6 +204,44 @@ function save(f::File{DataFormat{:WebP}}, image::AbstractArray; kwargs...)
 end
 function save(s::Stream{DataFormat{:WebP}}, image::AbstractArray; kwargs...)
     WebP.fileio_save(s, image; kwargs...)
+end
+
+## PCX/DCX
+
+function load(f::File{DataFormat{:PCX}})
+    data = PCXFiles.load(f)
+    return enforce_canonical_type(f, data)
+end
+
+function load(s::Stream{DataFormat{:PCX}})
+    data = PCXFiles.load(s)
+    return enforce_canonical_type(s, data)
+end
+
+function save(f::File{DataFormat{:PCX}}, image::AbstractMatrix; kwargs...)
+    PCXFiles.save(f, image; kwargs...)
+end
+
+function save(s::Stream{DataFormat{:PCX}}, image::AbstractMatrix; permute_horizontal=false, kwargs...)
+    if permute_horizontal
+        perm = (2, 1)
+        PCXFiles.save(s, PermutedDimsArray(image, perm); kwargs...)
+    else
+        PCXFiles.save(s, image; kwargs...)
+    end
+end
+
+function save(f::File{DataFormat{:DCX}}, images::AbstractVector{<:AbstractMatrix}; kwargs...)
+    PCXFiles.save(f, images; kwargs...)
+end
+
+function save(s::Stream{DataFormat{:DCX}}, images::AbstractVector{<:AbstractMatrix}; permute_horizontal=false, kwargs...)
+    if permute_horizontal
+        perm = (2, 1)
+        PCXFiles.save(s, PermutedDimsArray.(images, Ref(perm)); kwargs...)
+    else
+        PCXFiles.save(s, images; kwargs...)
+    end
 end
 
 ## Function names labelled for FileIO. Makes FileIO lookup quicker
