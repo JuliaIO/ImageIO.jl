@@ -29,6 +29,7 @@ for FMT in (
     :JPEG,
     :WebP,
     :PCX,
+    :DCX,
 )
     @eval canonical_type(::DataFormat{$(Expr(:quote, FMT))}, ::AbstractArray{T, N}) where {T,N} =
         Array{T,N}
@@ -214,6 +215,16 @@ function load(f::File{DataFormat{:PCX}})
 end
 
 function load(s::Stream{DataFormat{:PCX}})
+    data = PCXFiles.load(s)
+    return enforce_canonical_type(s, data)
+end
+
+function load(f::File{DataFormat{:DCX}})
+    data = PCXFiles.load(f)
+    return enforce_canonical_type(f, data)
+end
+
+function load(s::Stream{DataFormat{:DCX}})
     data = PCXFiles.load(s)
     return enforce_canonical_type(s, data)
 end
