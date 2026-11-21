@@ -228,4 +228,96 @@ Threads.nthreads() <= 1 && @info "Threads.nthreads() = $(Threads.nthreads()), mu
             end
         end
     end
+
+    @testset "PCXs" begin
+        bitkeys = [(1, 1), (1, 2), (1, 3), (1, 4), (4, 4), (2, 1), (4, 1), (8, 1), (8, 3)]
+
+        max_colors = Dict(
+            (1, 1) => 2,
+            (1, 2) => 4,
+            (1, 3) => 8,
+            (1, 4) => 16,
+            (2, 1) => 4,
+            (4, 1) => 16,
+            (4, 4) => 16,
+            (8, 1) => 256,
+            (8, 3) => 2^24,
+        )
+
+        function construct_image(ncolors, size)
+            # construct ncolors different colors
+            colors = Set{RGB{N0f8}}()
+            if ncolors == 2
+                # Force black
+                push!(colors, RGB{N0f8}(0, 0, 0))
+            end
+            while length(colors) < ncolors
+                push!(colors, rand(RGB{N0f8}))
+            end
+            # fill a matrix with a random set
+            return rand(colors, size, size)
+        end
+
+        function construct_transparent_image(ncolors, size)
+            # construct ncolors different transparent colors
+            colors = Set{RGBA{N0f8}}()
+            if ncolors == 2
+                # Force black
+                push!(colors, RGBA{N0f8}(0, 0, 0))
+            end
+            while length(colors) < ncolors
+                push!(colors, rand(RGBA{N0f8}))
+            end
+            # fill a matrix with a random set
+            return rand(colors, size, size)
+        end
+
+        @testset "RGB PCX" begin
+            for ncolors in (2, 4, 8, 16, 256, 512)
+                img = construct_image(ncolors, 10)
+                f = File{format"PCX"}(joinpath(tmpdir, "test_fpath.pcx"))
+                ImageIO.save(f, img)
+                img_saveload = ImageIO.load(f)
+                @test eltype(img_saveload) == RGB{N0f8}
+                @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
+           end
+        end
+
+        @testset "RGB DCX" begin
+            for ncolors in (2, 4, 8, 16, 256, 512)
+                imgs = [construct_image(ncolors, 10) for _ = 1:5]
+                f = File{format"DCX"}(joinpath(tmpdir, "test_fpath.dcx"))
+                ImageIO.save(f, imgs)
+                imgs_saveload = ImageIO.load(f)
+                @test length(imgs_saveload) == 5
+                @test eltype(imgs_saveload) <: Matrix
+                @test eltype(imgs_saveload[1]) == RGB{N0f8}
+                @test typeof(imgs_saveload) == ImageIO.canonical_type(f, imgs_saveload)
+           end
+        end
+
+        @testset "PCX with transparency" begin
+            for ncolors in (2, 4, 8, 16, 256, 512)
+                img = construct_transparent_image(ncolors, 10)
+                f = File{format"PCX"}(joinpath(tmpdir, "test_fpath.pcx"))
+                ImageIO.save(f, img)
+                img_saveload = ImageIO.load(f)
+                @test eltype(img_saveload) == RGBA{N0f8}
+                @test typeof(img_saveload) == ImageIO.canonical_type(f, img_saveload)
+           end
+        end
+
+        @testset "DCX with transparency" begin
+            for ncolors in (2, 4, 8, 16, 256, 512)
+                imgs = [construct_transparent_image(ncolors, 10) for _ = 1:5]
+                f = File{format"DCX"}(joinpath(tmpdir, "test_fpath.dcx"))
+                ImageIO.save(f, imgs)
+                imgs_saveload = ImageIO.load(f)
+                @test length(imgs_saveload) == 5
+                @test eltype(imgs_saveload) <: Matrix
+                @test eltype(imgs_saveload[1]) == RGBA{N0f8}
+                @test typeof(imgs_saveload) == ImageIO.canonical_type(f, imgs_saveload)
+           end
+        end
+    end
 end
